@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_test_socket"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="50dp"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.TrakEngineering.veeder_rootinterface.BluetoothIO">
+
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/Assignname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_row="1"
+            android:onClick="AssignName"
+            android:text="Assign name" />
+
+        <EditText
+            android:id="@+id/editText2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_row="0"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="Normal" />
+
+        <EditText
+            android:id="@+id/editText3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_row="0"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="Gatt" />
+
+        <EditText
+            android:id="@+id/UUID3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="2"
+            android:layout_row="0"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="UUID3" />
+
+        <Button
+            android:id="@+id/AssignMAC"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_row="2"
+            android:onClick="AssignMAC"
+            android:text="Assign MAC" />
+
+        <Button
+            android:id="@+id/Connect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_row="3"
+            android:onClick="connect"
+            android:text="Connect" />
+
+        <Button
+            android:id="@+id/Write"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_row="4"
+            android:text="Write" />
+
+        <Button
+            android:id="@+id/read"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_row="5"
+            android:text="read" />
+
+        <Button
+            android:id="@+id/close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_row="6"
+            android:onClick="close"
+            android:text="close" />
+
+        <Button
+            android:id="@+id/gatconnect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_row="2"
+            android:onClick="gatconnect"
+            android:text="gat connect" />
+
+        <Button
+            android:id="@+id/gatgetservice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_row="3"
+            android:onClick="gatgetservice"
+            android:text="gat get service" />
+
+        <Button
+            android:id="@+id/getservice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_row="7"
+            android:onClick="getservice"
+            android:text="get service" />
+
+        <Button
+            android:id="@+id/getservice2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_row="8"
+            android:onClick="getservice2"
+            android:text="get service 2" />
+
+        <Button
+            android:id="@+id/connectinsecure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_row="9"
+            android:onClick="connectinsecure"
+            android:text="connect insecure" />
+
+        <Button
+            android:id="@+id/beginwrite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_row="4"
+            android:onClick="beginwrite"
+            android:text="begin write" />
+
+        <Button
+            android:id="@+id/ExecuteWrite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_row="5"
+            android:onClick="executewrite"
+            android:text="Execute Write" />
+
+        <Button
+            android:id="@+id/gatdiscoverservice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_row="6"
+            android:onClick="gatdiscoverservice"
+            android:text="gat discover service" />
+
+        <Button
+            android:id="@+id/gatdisconnect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_row="7"
+            android:onClick="gatdisconnect"
+            android:text="gat disconnect" />
+
+        <Button
+            android:id="@+id/gatclose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_row="8"
+            android:onClick="gatclose"
+            android:text="gat close" />
+
+        <Button
+            android:id="@+id/UUID0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_row="10"
+            android:onClick="UUID0"
+            android:text="UUID 0" />
+
+        <Button
+            android:id="@+id/UUID1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_row="11"
+            android:onClick="UUID1"
+            android:text="UUID 1" />
+
+        <Button
+            android:id="@+id/find"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_row="12"
+            android:onClick="findBT"
+            android:text="find" />
+
+        <Button
+            android:id="@+id/DisplayGatService"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_row="9"
+            android:onClick="DisplayGatService"
+            android:text="DisplayGatService" />
+
+        <Button
+            android:id="@+id/GATConnect2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_row="10"
+            android:onClick="GATConnect2"
+            android:text="GATConnect2" />
+
+        <Button
+            android:id="@+id/SetValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="2"
+            android:layout_row="2"
+            android:onClick="SetValue"
+            android:text="SetValue" />
+
+        <Button
+            android:id="@+id/cancelDisc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_row="11"
+            android:onClick="cancelDisc"
+            android:text="cancelDisc" />
+
+        <Button
+            android:id="@+id/ReadVal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="2"
+            android:layout_row="3"
+            android:onClick="ReadVal"
+            android:text="ReadVal" />
+
+        <Button
+            android:id="@+id/WriteVal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="2"
+            android:layout_row="4"
+            android:onClick="WriteVal"
+            android:text="WriteVal" />
+
+        <Button
+            android:id="@+id/ReadVal2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="2"
+            android:layout_row="5"
+            android:onClick="ReadVal2"
+            android:text="ReadVal2" />
+
+        <Button
+            android:id="@+id/Notify"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="2"
+            android:layout_row="6"
+            android:onClick="Notify"
+            android:text="Notify" />
+
+    </GridLayout>
+</LinearLayout>

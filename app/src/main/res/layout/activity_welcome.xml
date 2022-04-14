@@ -1,0 +1,604 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    tools:context="com.TrakEngineering.veeder_rootinterface.WelcomeActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorFluid"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorFluid"
+                    android:gravity="left"
+                    android:padding="20dp"
+                    android:paddingLeft="40dp"
+                    android:text="Welcome"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="#fff"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorFluid"
+                    android:gravity="right"
+                    android:paddingLeft="40dp"
+                    android:text="Baud Rate: "
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="#fff"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/tv_current_baud_rate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorFluid"
+                    android:gravity="right"
+                    android:text="----"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="#fff"
+                    android:textSize="20sp" />
+
+                <Button
+                    android:id="@+id/btnSetBaudRate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:background="#fff"
+                    android:clickable="true"
+                    android:text="Set new"
+                    android:textColor="@color/colorFluid"
+                    android:textSize="16sp" />
+
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:orientation="vertical">
+
+
+                <ImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="339dp"
+                    android:layout_height="195dp"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/fuel_secure_lock" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearMac"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mac Address:"
+                    android:textSize="17dp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/edt_mac_address"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="80:7D:3A:A4:67:22"
+                    android:maxLength="17" />
+
+                <Button
+                    android:id="@+id/btn_connect"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="Connect"
+                    android:textAllCaps="false" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_disConnect"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_gravity="center"
+                android:text="Disconnect"
+                android:textAllCaps="false" />
+
+
+            <Button
+                android:id="@+id/btnGo"
+                android:layout_width="match_parent"
+                android:layout_height="195dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="40dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="40dp"
+                android:background="@color/pressed_start_multi"
+                android:clickable="true"
+                android:onClick="goButtonAction"
+                android:text="@string/GoButton"
+                android:textColor="#fff"
+                android:textSize="@dimen/go_button_text"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvLatLng"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:gravity="center" />
+
+
+            <Button
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:onClick="onChangeWifiAction"
+                android:padding="5sp"
+                android:text="Refresh List"
+                android:textColor="@color/colorPrimary"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:gravity="bottom"
+                android:orientation="vertical">
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="bottom"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/imgFuelLogo"
+                        android:layout_width="150dp"
+                        android:layout_height="100dp"
+                        android:src="@drawable/trak_logo_small" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:gravity="left|center_vertical"
+                        android:text="@string/add"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="26dp"
+                    android:layout_marginTop="12dp"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/textDateTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Date: 11.30 May 02, 2016 "
+                            android:textColor="#000"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/tvVersionNum"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="15dp"
+                            android:text="Version: "
+                            android:textColor="#000"
+                            android:textSize="18sp" />
+
+                    </LinearLayout>
+
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Support:  support@fluidsecure.com or 850-878-4585"
+                        android:textColor="#000"
+                        android:textSize="18sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
+
+                    <LinearLayout
+                        android:id="@+id/linear_fs_1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="5dp"
+                        android:layout_weight="1"
+                        android:background="@color/Dashboard_background"
+                        android:orientation="vertical"
+                        android:padding="0dp">
+
+                        <TableLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <TableRow>
+
+                                <TextView
+                                    android:id="@+id/tv_FS1_hoseName"
+                                    style="@style/TextViewStyleDashboard"
+                                    android:layout_width="match_parent"
+                                    android:text="Tank One"
+                                    android:textColor="@color/black" />
+
+                                <TextView
+                                    android:id="@+id/tv_NFS1"
+                                    style="@style/TextViewStyleDashboard"
+                                    android:layout_width="0dp"
+                                    android:layout_height="0dp"
+                                    android:text="Hose 1:"
+                                    android:textColor="@color/black" />
+
+
+                            </TableRow>
+
+
+                        </TableLayout>
+
+                        <TableLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <!-- <TableRow>
+
+                                 <TextView
+                                     android:id="@+id/tv_fs1QTN"
+                                     style="@style/TextViewStyleQuantity"
+                                     android:text="@string/TLstring"
+                                     android:textColor="@color/black" />
+
+                                 <TextView
+                                     android:id="@+id/tv_fs1_Qty"
+                                     style="@style/TextViewStyleQuantity"
+                                     android:layout_width="match_parent"
+                                     android:layout_weight="1"
+                                     android:gravity="right"
+                                     android:text=""
+                                     android:textColor="@color/black" />
+
+                             </TableRow>-->
+
+                            <TableRow>
+
+
+                            </TableRow>
+
+
+                        </TableLayout>
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/linear_fs_2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:background="@color/Dashboard_background"
+                        android:orientation="vertical"
+                        android:padding="0dp">
+
+                        <TableLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <TableRow>
+
+                                <TextView
+                                    android:id="@+id/tv_FS2_hoseName"
+                                    style="@style/TextViewStyleDashboard"
+                                    android:layout_width="match_parent"
+                                    android:text="Tank Two"
+                                    android:textColor="@color/black" />
+
+                                <TextView
+                                    android:id="@+id/tv_NFS2"
+                                    style="@style/TextViewStyleDashboard"
+                                    android:layout_width="0dp"
+                                    android:layout_height="0dp"
+                                    android:text="Hose 2:"
+                                    android:textColor="@color/black" />
+
+
+                            </TableRow>
+
+                        </TableLayout>
+
+                        <TableLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <TableRow>
+
+                                <!--<TextView
+                                    android:id="@+id/tv_fs2QTN"
+                                    style="@style/TextViewStyleQuantity"
+                                    android:text="@string/TLstring"
+                                    android:textColor="@color/black" />
+
+                                <TextView
+                                    android:id="@+id/tv_fs2_Qty"
+                                    style="@style/TextViewStyleQuantity"
+                                    android:layout_width="match_parent"
+                                    android:layout_weight="1"
+                                    android:gravity="right"
+                                    android:text=""
+                                    android:textColor="@color/black" />-->
+
+                            </TableRow>
+
+                            <TableRow>
+
+                            </TableRow>
+
+
+                        </TableLayout>
+
+                    </LinearLayout>
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
+
+                    <LinearLayout
+                        android:id="@+id/linear_fs_3"
+
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="5dp"
+                        android:layout_weight="1"
+                        android:background="@color/Dashboard_background"
+                        android:orientation="vertical"
+                        android:padding="0dp">
+
+                        <TableLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <TableRow
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+                                <TextView
+                                    android:id="@+id/tv_FS3_hoseName"
+                                    style="@style/TextViewStyleDashboard"
+                                    android:layout_width="match_parent"
+                                    android:text="Tank Three"
+                                    android:textColor="@color/black" />
+
+                                <TextView
+                                    android:id="@+id/tv_NFS3"
+                                    style="@style/TextViewStyleDashboard"
+                                    android:layout_width="0dp"
+                                    android:layout_height="0dp"
+                                    android:text="Tank 3:"
+                                    android:textColor="@color/black" />
+
+
+                            </TableRow>
+
+
+                        </TableLayout>
+
+                        <TableLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <TableRow>
+
+                                <!--   <TextView
+                                       android:id="@+id/tv_fs3QTN"
+                                       style="@style/TextViewStyleQuantity"
+                                       android:text="@string/TLstring"
+                                       android:textColor="@color/black" />
+
+
+                                   <TextView
+                                       android:id="@+id/tv_fs3_Qty"
+                                       style="@style/TextViewStyleQuantity"
+                                       android:layout_width="match_parent"
+                                       android:layout_weight="1"
+                                       android:gravity="right"
+                                       android:text=""
+                                       android:textColor="@color/black" />-->
+
+                            </TableRow>
+
+                            <TableRow>
+
+
+                            </TableRow>
+
+
+                        </TableLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/linear_fs_4"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:background="@color/Dashboard_background"
+                        android:orientation="vertical"
+                        android:padding="0dp">
+
+                        <TableLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+
+                            <TableRow>
+
+                                <TextView
+                                    android:id="@+id/tv_FS4_hoseName"
+                                    style="@style/TextViewStyleDashboard"
+                                    android:layout_width="match_parent"
+                                    android:text="Tank Four"
+                                    android:textColor="@color/black" />
+
+                                <TextView
+                                    android:id="@+id/tv_NFS4"
+                                    style="@style/TextViewStyleDashboard"
+                                    android:layout_width="0dp"
+                                    android:layout_height="0dp"
+                                    android:text="Hose 4:"
+                                    android:textColor="@color/black" />
+
+
+                            </TableRow>
+
+                        </TableLayout>
+
+                        <TableLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+
+                            <TableRow>
+
+                                <!--  <TextView
+                                      android:id="@+id/tv_fs4QTN"
+                                      style="@style/TextViewStyleQuantity"
+                                      android:text="@string/TLstring"
+                                      android:textColor="@color/black" />
+
+                                  <TextView
+                                      android:id="@+id/tv_fs4_Qty"
+                                      style="@style/TextViewStyleQuantity"
+                                      android:layout_width="match_parent"
+                                      android:layout_weight="1"
+                                      android:gravity="right"
+                                      android:text=""
+                                      android:textColor="@color/black" />-->
+
+                            </TableRow>
+
+                            <TableRow>
+
+
+                            </TableRow>
+
+                        </TableLayout>
+
+                    </LinearLayout>
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_get_vr_readings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp"
+                    android:layout_gravity="center"
+                    android:visibility="visible"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/edt_vr_command"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:editable="true"
+                            android:hint="  01 32 30 30  "
+                            android:text="01 32 30 30"
+                            android:maxLength="50" />
+
+                        <Button
+                            android:id="@+id/btn_get_vr_readings"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Get VR Readings"
+                            android:textAllCaps="false" />
+
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/tv_display_vr_response">
+
+                    </TextView>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

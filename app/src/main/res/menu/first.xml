@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu>
+
+    <!--    <item android:id="@+id/mClose"
+            android:icon="@drawable/close"
+            android:title="Close"
+            app:showAsAction="always"/>-->
+</menu>
