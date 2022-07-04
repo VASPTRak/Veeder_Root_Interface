@@ -332,9 +332,9 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
         // set User Information
         UserInfoEntity userInfoEntity = CommonUtils.getCustomerDetails(WelcomeActivity.this);
         if (userInfoEntity.FluidSecureSiteName != "") {
-            AppConstants.Title = "Hub name : " + userInfoEntity.FluidSecureSiteName;
+            AppConstants.Title = "HUB Name : " + userInfoEntity.FluidSecureSiteName;
         } else {
-            AppConstants.Title = "Hub name : " + userInfoEntity.PersonName;//+ "\nMobile : " + userInfoEntity.PhoneNumber + "\nEmail : " + userInfoEntity.PersonEmail
+            AppConstants.Title = "HUB Name : " + userInfoEntity.PersonName;//+ "\nMobile : " + userInfoEntity.PhoneNumber + "\nEmail : " + userInfoEntity.PersonEmail
         }
         AppConstants.HubName = userInfoEntity.PersonName;
         TextView tvTitle = findViewById(textView);

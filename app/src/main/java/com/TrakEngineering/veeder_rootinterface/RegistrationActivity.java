@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -44,13 +45,6 @@ public class RegistrationActivity extends AppCompatActivity {
     private AutoCompleteTextView etEmail;
     private Button btnSubmit;
 
-    private static void redToast(Context ctx, String MSg) {
-        Toast toast = Toast.makeText(ctx, " " + MSg + " ", Toast.LENGTH_LONG);
-        toast.getView().setBackgroundColor(Color.RED);
-        toast.setGravity(Gravity.CENTER, 0, 0);
-        toast.show();
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,7 +64,15 @@ public class RegistrationActivity extends AppCompatActivity {
         TextView tvVersionNum = findViewById(R.id.tvVersionNum);
         tvVersionNum.setText("Version " + CommonUtils.getVersionCode(RegistrationActivity.this));
 
-        Pattern US_PHONE_PATTERN = Pattern.compile("^(?:(?:\\+?1\\s*(?:[.-]\\s*)?)?(?:\\(\\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\\s*\\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\\s*(?:[.-]\\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\\s*(?:[.-]\\s*)?([0-9]{4})(?:\\s*(?:#|x\\.?|ext\\.?|extension)\\s*(\\d+))?$", Pattern.CASE_INSENSITIVE);
+        try {
+            TelephonyManager tMgr = (TelephonyManager) getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
+            String mPhoneNumber = tMgr.getLine1Number();
+            etMobile.setText(mPhoneNumber);
+        }catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        //Pattern US_PHONE_PATTERN = Pattern.compile("^(?:(?:\\+?1\\s*(?:[.-]\\s*)?)?(?:\\(\\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\\s*\\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\\s*(?:[.-]\\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\\s*(?:[.-]\\s*)?([0-9]{4})(?:\\s*(?:#|x\\.?|ext\\.?|extension)\\s*(\\d+))?$", Pattern.CASE_INSENSITIVE);
 
         Pattern EMAIL_PATTERN = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$", Pattern.CASE_INSENSITIVE);
         Account[] accounts = AccountManager.get(this).getAccounts();
@@ -81,11 +83,6 @@ public class RegistrationActivity extends AppCompatActivity {
             }
         }
         etEmail.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, new ArrayList<>(emailSet)));
-
-
-
-
-
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -136,8 +133,8 @@ public class RegistrationActivity extends AppCompatActivity {
 
                     SplashActivity.writeIMEI_UUIDInFile(RegistrationActivity.this, imeiNumber); ;
 
-
                     new RegisterUser(userName, userMobile, userEmail, imeiNumber, AppConstants.DEVICE_TYPE, userCompany).execute();
+
 
                     //------------------------------------------------------------------------------
 
@@ -145,6 +142,13 @@ public class RegistrationActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private static void redToast(Context ctx, String MSg) {
+        Toast toast = Toast.makeText(ctx, " " + MSg + " ", Toast.LENGTH_LONG);
+        toast.getView().setBackgroundColor(Color.RED);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
     }
 
     private boolean isValidEmail(String email) {
@@ -200,13 +204,13 @@ public class RegistrationActivity extends AppCompatActivity {
     public class RegisterUser extends AsyncTask<Void, Void, String> {
 
         private static final String TAG = "RegisterUser :";
+        ProgressDialog pd;
         final String userName;
         final String userMobile;
         final String userEmail;
         final String imeiNumber;
         final String deviceType;
         final String userCompany;
-        ProgressDialog pd;
 
         RegisterUser(String userName, String userMobile, String userEmail, String imeiNumber, String deviceType, String userCompany) {
             this.userName = userName;
@@ -232,7 +236,7 @@ public class RegistrationActivity extends AppCompatActivity {
             try {
 
                // String sendData = userName + "#:#" + userMobile + "#:#" + userEmail + "#:#" + imeiNumber + "#:#" + deviceType + "#:#" + userCompany + "#:#" + "AP";
-                String sendData = userName + "#:#" + "" + "#:#" + "" + "#:#" + imeiNumber + "#:#" + deviceType + "#:#" + "" + "#:#" + "AP";
+                String sendData = userName + "#:#" + userMobile + "#:#" + "" + "#:#" + imeiNumber + "#:#" + deviceType + "#:#" + "" + "#:#" + "AP";
 
                 String AUTH_TOKEN = "Basic " + AppConstants.convertStingToBase64("123:abc:Register");
                 ServerHandler serverHandler = new ServerHandler();

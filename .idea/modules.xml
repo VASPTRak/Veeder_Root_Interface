@@ -4,6 +4,9 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Veeder_Root_Interface.iml" filepath="$PROJECT_DIR$/.idea/modules/Veeder_Root_Interface.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Veeder_Root_Interface.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Veeder_Root_Interface.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Veeder_Root_Interface.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Veeder_Root_Interface.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Veeder_Root_Interface.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Veeder_Root_Interface.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Veeder_Root_Interface.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Veeder_Root_Interface.app.unitTest.iml" />
     </modules>
   </component>
 </project>
