@@ -631,7 +631,7 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
 
 
         } catch (Exception e) {
-            CommonUtils.LogMessage(TAG, "", e);
+            CommonUtils.LogMessage(TAG, " CheckApproved Exception ", e);
         }
     }
 

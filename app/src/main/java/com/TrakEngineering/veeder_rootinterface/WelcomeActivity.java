@@ -1306,13 +1306,11 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
                 Response response = client.newCall(request).execute();
                 resp = response.body().string();
 
-
                 //------------------------------
 
             } catch (Exception e) {
                 System.out.println("Ex" + e.getMessage());
             }
-
 
             return resp;
         }
@@ -1459,8 +1457,9 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
                     }
                 } else {
                    // AppConstants.AlertDialogFinish(WelcomeActivity.this, "Unable to connect server. Please try again later!");
+                    CommonUtils.LogMessage(TAG, " server response is empty. Restarting the app.");
+                    RestartApplication();
                 }
-
 
             } catch (Exception e) {
 
@@ -1469,6 +1468,12 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
             if (VR_polling_interval < 1) VR_polling_interval = 4;
 
         }
+    }
+
+    private void RestartApplication() {
+        Intent i = new Intent(WelcomeActivity.this, SplashActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(i);
     }
 
     public class GetConnectedDevicesIP extends AsyncTask<String, Void, String> {
