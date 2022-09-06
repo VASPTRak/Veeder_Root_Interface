@@ -455,6 +455,7 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
                                 // System.out.println("FS UI Update here");
                                 int FS_Count = CommonUtils.NumNonZero(Constants.TankNumbers);
                                 //int FS_Count = serverSSIDList.size();
+
                                 if (FS_Count > 0) {
 
                                     //FS Visibility on Dashboard
@@ -530,6 +531,63 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
                                         params1.height = match_parent; // In dp
                                         linear_fs_4.setLayoutParams(params1);*/
 
+                                    }
+                                } else {
+                                    try {
+                                        FS_Count = Constants.TankList.size();
+                                        if (FS_Count > 0) {
+
+                                            //FS Visibility on Dashboard
+                                            if (FS_Count == 1) {
+                                                tv_FS1_hoseName.setText("Tank " + Constants.TankList.get(0).get("TankNumber"));
+
+                                                linear_fs_1.setVisibility(View.VISIBLE);
+                                                linear_fs_2.setVisibility(View.INVISIBLE);
+                                                linear_fs_3.setVisibility(View.INVISIBLE);
+                                                linear_fs_4.setVisibility(View.INVISIBLE);
+
+                                            } else if (FS_Count == 2) {
+
+                                                tv_FS1_hoseName.setText("Tank " + Constants.TankList.get(0).get("TankNumber"));
+                                                tv_FS2_hoseName.setText("Tank " + Constants.TankList.get(1).get("TankNumber"));
+
+                                                linear_fs_1.setVisibility(View.VISIBLE);
+                                                linear_fs_2.setVisibility(View.VISIBLE);
+
+                                                linear_fs_3.setVisibility(View.INVISIBLE);
+                                                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) linear_fs_3.getLayoutParams();
+                                                params.height = 0; // In dp
+                                                linear_fs_3.setLayoutParams(params);
+
+                                                linear_fs_4.setVisibility(View.INVISIBLE);
+                                                LinearLayout.LayoutParams params1 = (LinearLayout.LayoutParams) linear_fs_4.getLayoutParams();
+                                                params1.height = 0; // In dp
+                                                linear_fs_4.setLayoutParams(params1);
+
+                                            } else if (FS_Count == 3) {
+                                                tv_FS1_hoseName.setText("Tank " + Constants.TankList.get(0).get("TankNumber"));
+                                                tv_FS2_hoseName.setText("Tank " + Constants.TankList.get(1).get("TankNumber"));
+                                                tv_FS3_hoseName.setText("Tank " + Constants.TankList.get(2).get("TankNumber"));
+
+                                                linear_fs_1.setVisibility(View.VISIBLE);
+                                                linear_fs_2.setVisibility(View.VISIBLE);
+                                                linear_fs_3.setVisibility(View.VISIBLE);
+                                                linear_fs_4.setVisibility(View.INVISIBLE);
+
+                                            } else {
+                                                tv_FS1_hoseName.setText("Tank " + Constants.TankList.get(0).get("TankNumber"));
+                                                tv_FS2_hoseName.setText("Tank " + Constants.TankList.get(1).get("TankNumber"));
+                                                tv_FS3_hoseName.setText("Tank " + Constants.TankList.get(2).get("TankNumber"));
+                                                tv_FS4_hoseName.setText("Tank " + Constants.TankList.get(3).get("TankNumber"));
+
+                                                linear_fs_1.setVisibility(View.VISIBLE);
+                                                linear_fs_2.setVisibility(View.VISIBLE);
+                                                linear_fs_3.setVisibility(View.VISIBLE);
+                                                linear_fs_4.setVisibility(View.VISIBLE);
+                                            }
+                                        }
+                                    } catch (Exception ex) {
+                                        CommonUtils.LogMessage(TAG, "TankList is empty." + "\n", ex);
                                     }
                                 }
 

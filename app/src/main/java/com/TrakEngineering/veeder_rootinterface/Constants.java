@@ -8,6 +8,7 @@ import android.support.constraint.BuildConfig;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -24,7 +25,7 @@ class Constants {
     // values have to be unique within each app
     static final int NOTIFY_MANAGER_START_FOREGROUND_SERVICE = 1001;
 
-
+    public static ArrayList<HashMap<String,String>> TankList = new ArrayList<>();
     static boolean deguglog = true;
     final public static String VEHICLE_NUMBER="vehicleNumber";
     final public static String ODO_METER="Odometer";

@@ -62,7 +62,7 @@ import static com.TrakEngineering.veeder_rootinterface.Constants.VR_polling_inte
 public class SplashActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     public static String VR_BT_MAC_ADDR;
-    public ArrayList<HashMap<String,String>> TankList = new ArrayList<>();
+    //public ArrayList<HashMap<String,String>> TankList = new ArrayList<>();
     private static final int REQUEST_CHECK_SETTINGS = 0x1;
     private static final String TAG = "SplashActivity";
     private static final int REQUEST_LOCATION = 2;
@@ -550,7 +550,7 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
 
 
                     JSONArray TankArray = jsonObject.getJSONArray("tanksObj");
-                    TankList = new ArrayList<>();
+                    Constants.TankList = new ArrayList<>();
                     for (int i = 0; i < TankArray.length(); i++) {
                         // create a JSONObject for fetching single user data
                             JSONObject userDetail = TankArray.getJSONObject(i);
@@ -566,7 +566,7 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
                         map.put("TankName", TankName);
                         map.put("ScheduleTankReading", ScheduleTankReading);
                         map.put("ReceiveDeliveryInformation", ReceiveDeliveryInformation);
-                        TankList.add(map);
+                        Constants.TankList.add(map);
 
 
                         VR_polling_interval = Math.max(VR_polling_interval, Integer.parseInt(ScheduleTankReading));
