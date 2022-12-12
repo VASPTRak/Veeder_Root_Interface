@@ -3,7 +3,6 @@ package com.TrakEngineering.veeder_rootinterface;
 import android.app.AlarmManager;
 import android.content.Context;
 import android.os.Environment;
-import android.support.constraint.BuildConfig;
 
 import java.io.File;
 import java.util.ArrayList;
