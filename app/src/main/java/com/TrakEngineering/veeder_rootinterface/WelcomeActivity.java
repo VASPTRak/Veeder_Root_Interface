@@ -2406,7 +2406,7 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
                 }
 
             } else {
-                Toast.makeText(getApplicationContext(), "Please enter command", Toast.LENGTH_SHORT);
+                Toast.makeText(getApplicationContext(), "Please enter command", Toast.LENGTH_SHORT).show();
             }
 
             //Clear response text view in 60 sec
@@ -2630,7 +2630,7 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
     private void InitializeVRService(){
 
         Intent myIntent = new Intent(WelcomeActivity.this, VRInitAlarmService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 0, myIntent, 0);
+        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 0, myIntent, PendingIntent.FLAG_IMMUTABLE);
 
         // Set the alarm to start at 11:10 a.m.
         Calendar calendar = Calendar.getInstance();
@@ -2641,9 +2641,9 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
         AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 60000 * 60 * 24, pendingIntent);
-
-        if(calendar.after(Calendar.getInstance())) {
-            this.startService(new Intent(WelcomeActivity.this,VRInitAlarmService.class));
+        if (calendar.after(Calendar.getInstance())) {
+            CommonUtils.LogMessage(TAG, "InitializeVRService : starting VRInitAlarmService"); // #2238
+            this.startService(new Intent(WelcomeActivity.this, VRInitAlarmService.class));
         }
 
     }

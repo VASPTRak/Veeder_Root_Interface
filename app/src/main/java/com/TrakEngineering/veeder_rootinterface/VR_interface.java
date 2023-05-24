@@ -138,7 +138,6 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
                                                  int status) {
                     CommonUtils.LogMessage(TAG, "onCharacteristicRead received: " + status + characteristic);
 
-
                     byte[] value = characteristic.getValue();
                     try {
                         Log.w(TAG, "Read value:" + new String(value));
@@ -147,7 +146,6 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
                         ex.printStackTrace();
                     }
                 }
-
 
                 @Override
                 public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
@@ -166,10 +164,10 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
                         if (value[value.length - 1] == Constants.ETX) {
                             if (ValidChecksum(response_message)) {
                                 flag_GotResponse = true;
-                                CommonUtils.LogMessage(TAG, "Got good response: " + response_message + "\n", null);
+                                CommonUtils.LogMessage(TAG, "VR_interface (onCharacteristicChanged): Got good response: " + response_message + "\n", null);
                                 Proccess_all_response(response_message);
                             } else {
-                                CommonUtils.LogMessage(TAG, "Got bad response: " + response_message + "\n", null);
+                                CommonUtils.LogMessage(TAG, "VR_interface (onCharacteristicChanged): Got bad response: " + response_message + "\n", null);
                                 Log.w(TAG, "Bad Checksum");
                             }
                         }
@@ -450,7 +448,7 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
                     jsonData = gson.toJson(authEntityClass);
 
                     System.out.println("AP_FS33 VR_Delivery_InfoEntity......" + jsonData);
-                    CommonUtils.LogMessage("VR_INTERFACE", "- VR_Delivery_InfoEntity  " + jsonData, null);
+                    CommonUtils.LogMessage("VR_INTERFACE", "- VR_Delivery_InfoEntity: " + jsonData, null);
                 } else {
 
                     CommonUtils.LogMessage("VR_INTERFACE", "- DELIVERY SKIPPED  ", null);
@@ -512,7 +510,7 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
             }
 
 
-            CommonUtils.LogMessage(TAG, "sending data: " + jsonData + "\n", null);
+            CommonUtils.LogMessage(TAG, "VR_interface: sending data: " + jsonData + "\n", null);
             //put it into the correct format
 
 
@@ -828,7 +826,7 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
     }
 
     public void Proccess_all_response(String responseString) {
-        CommonUtils.LogMessage(TAG, responseString, null);
+        CommonUtils.LogMessage(TAG, "VR_interface Response: " + responseString, null);
 
         String CommandCode = responseString.substring(1, 5);//he first is SOH: ignore it
         switch (CommandCode) {
@@ -931,6 +929,7 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        CommonUtils.LogMessage(TAG, "VR_interface started."); // #2238
         //run when the class is launched.
         Do_next_VR_interface_Service();
 
@@ -971,7 +970,7 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
             if (!AppConstants.RunningPoll) {
                 AppConstants.RunningPoll = true;
 
-                CommonUtils.LogMessage(TAG, "Starting poll + wait_time");
+                CommonUtils.LogMessage(TAG, "VR_interface: Starting poll + wait_time");
                 Log.w(TAG, "Starting poll");
                 new USB_VR_connect2().execute(); // tempararily commente out to do a long-term test.
             }
@@ -1173,10 +1172,10 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
                         if (value[value.length - 1] == Constants.ETX) {
                             if (ValidChecksum(response_message)) {
                                 flag_GotResponse = true;
-                                CommonUtils.LogMessage(TAG, "Got good response: " + response_message + "\n", null);
+                                CommonUtils.LogMessage(TAG, "VR_interface: Got good response: " + response_message + "\n", null);
                                 Proccess_all_response(response_message);
                             } else {
-                                CommonUtils.LogMessage(TAG, "Got bad response: " + response_message + "\n", null);
+                                CommonUtils.LogMessage(TAG, "VR_interface: Got bad response: " + response_message + "\n", null);
                                 Log.w(TAG, "Bad Checksum");
                             }
                         }
@@ -1280,13 +1279,13 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
                     Thread.sleep(sleepTime_ms);
                     seconds_attempt += sleepTime_ms * 1.0 / 1000;
                     if (seconds_attempt > maxTime) {  //wait , then try again
-                        CommonUtils.LogMessage(TAG, "could not get inventory response", null);
+                        CommonUtils.LogMessage(TAG, "VR_interface: could not get inventory response", null);
 
                         seconds_attempt = 0;
                         num_attepts++;
                         if (num_attepts > maxAttempts) //tried 5 times, give up
                         {
-                            CommonUtils.LogMessage(TAG, "could not get inventory response giving up");
+                            CommonUtils.LogMessage(TAG, "VR_interface: could not get inventory response giving up");
                             SendToast("Could not get inventory response", false);
                             break;
                         } else {
@@ -1311,7 +1310,7 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
                         seconds_attempt = 0;
                         num_attepts++;
                         if (num_attepts > maxAttempts) {//tried 5 times, give up
-                            CommonUtils.LogMessage(TAG, "could not get deliver response giving up");
+                            CommonUtils.LogMessage(TAG, "VR_interface: could not get deliver response giving up");
                             SendToast("Could not get delivery response", false);
                             break;
                         } else {
@@ -1399,7 +1398,7 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
             wait_time = (long) (60 * 60 * 1000);
         }*/
         Log.w(TAG, "waiting :" + wait_time);
-        CommonUtils.LogMessage(TAG, "waiting :" + wait_time);
+        CommonUtils.LogMessage(TAG, "VR_interface waiting :" + wait_time);
 
         Constants.alarm.setRepeating(AlarmManager.RTC_WAKEUP, wait_time + currentTimeMillis(), (long) (24.0 / VR_polling_interval) * 60 * 60 * 1000, pintent);  //by defualt, 6 hours
     }

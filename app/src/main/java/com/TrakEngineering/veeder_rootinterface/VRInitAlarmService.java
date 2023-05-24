@@ -31,7 +31,7 @@ public class VRInitAlarmService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         Log.i(TAG," ~OnStart~ ");
-        CommonUtils.LogMessage(TAG, " ~OnStart~ PollingInterval:" + VR_polling_interval);
+        CommonUtils.LogMessage(TAG, "~VRInitAlarmService Started~~ PollingInterval: " + VR_polling_interval);
 
         //Set exact alaram every 24 hours.
         GetExactVRReadings();  //Exact VR-Reading logic added on 3rd august 2021
@@ -141,12 +141,11 @@ public class VRInitAlarmService extends Service {
         }
 
         Intent intent = new Intent(getApplicationContext(), VRAlarmService.class);
-        PendingIntent pendingIntent1 = PendingIntent.getService(getApplicationContext(),1,intent,FLAG_CANCEL_CURRENT);
+        PendingIntent pendingIntent1 = PendingIntent.getService(getApplicationContext(), 1, intent, FLAG_CANCEL_CURRENT);
         AlarmManager exat_alarm_12am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         exat_alarm_12am.cancel(pendingIntent1);
+        CommonUtils.LogMessage(TAG, "VRInitAlarmService: AlarmAt12Am"); // #2238
         exat_alarm_12am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent1);
-
-
     }
 
     private void AlarmAt4Am() {
@@ -161,9 +160,10 @@ public class VRInitAlarmService extends Service {
         }
 
         Intent intent = new Intent(getApplicationContext(), VRAlarmService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(),2,intent,FLAG_CANCEL_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 2, intent, FLAG_CANCEL_CURRENT);
         AlarmManager exat_alarm_4am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         exat_alarm_4am.cancel(pendingIntent);
+        CommonUtils.LogMessage(TAG, "VRInitAlarmService: AlarmAt4Am"); // #2238
         exat_alarm_4am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent);
 
     }
@@ -180,9 +180,10 @@ public class VRInitAlarmService extends Service {
         }
 
         Intent intent = new Intent(getApplicationContext(), VRAlarmService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(),3,intent,FLAG_CANCEL_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 3, intent, FLAG_CANCEL_CURRENT);
         AlarmManager exat_alarm_6am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         exat_alarm_6am.cancel(pendingIntent);
+        CommonUtils.LogMessage(TAG, "VRInitAlarmService: AlarmAt6Am"); // #2238
         exat_alarm_6am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent);
 
     }
@@ -199,9 +200,10 @@ public class VRInitAlarmService extends Service {
         }
 
         Intent intent = new Intent(getApplicationContext(), VRAlarmService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(),4,intent,FLAG_CANCEL_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 4, intent, FLAG_CANCEL_CURRENT);
         AlarmManager exat_alarm_8am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         exat_alarm_8am.cancel(pendingIntent);
+        CommonUtils.LogMessage(TAG, "VRInitAlarmService: AlarmAt8am"); // #2238
         exat_alarm_8am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent);
 
     }
@@ -218,9 +220,10 @@ public class VRInitAlarmService extends Service {
         }
 
         Intent intent = new Intent(getApplicationContext(), VRAlarmService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(),5,intent,FLAG_CANCEL_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 5, intent, FLAG_CANCEL_CURRENT);
         AlarmManager exat_alarm_12pm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         exat_alarm_12pm.cancel(pendingIntent);
+        CommonUtils.LogMessage(TAG, "VRInitAlarmService: AlarmAt12pm"); // #2238
         exat_alarm_12pm.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent);
 
     }
@@ -237,9 +240,10 @@ public class VRInitAlarmService extends Service {
         }
 
         Intent intent = new Intent(getApplicationContext(), VRAlarmService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(),6,intent,FLAG_CANCEL_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 6, intent, FLAG_CANCEL_CURRENT);
         AlarmManager exat_alarm_4pm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         exat_alarm_4pm.cancel(pendingIntent);
+        CommonUtils.LogMessage(TAG, "VRInitAlarmService: AlarmAt4pm"); // #2238
         exat_alarm_4pm.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent);
 
     }
@@ -256,9 +260,10 @@ public class VRInitAlarmService extends Service {
         }
 
         Intent intent = new Intent(getApplicationContext(), VRAlarmService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(),7,intent,FLAG_CANCEL_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 7, intent, FLAG_CANCEL_CURRENT);
         AlarmManager exat_alarm_6pm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         exat_alarm_6pm.cancel(pendingIntent);
+        CommonUtils.LogMessage(TAG, "VRInitAlarmService: AlarmAt6Pm"); // #2238
         exat_alarm_6pm.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent);
 
     }
@@ -275,11 +280,11 @@ public class VRInitAlarmService extends Service {
         }
 
         Intent intent = new Intent(getApplicationContext(), VRAlarmService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(),8,intent,FLAG_CANCEL_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 8, intent, FLAG_CANCEL_CURRENT);
         AlarmManager exat_alarm_8pm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         exat_alarm_8pm.cancel(pendingIntent);
+        CommonUtils.LogMessage(TAG, "VRInitAlarmService: AlarmAt8pm"); // #2238
         exat_alarm_8pm.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent);
-
 
     }
 }

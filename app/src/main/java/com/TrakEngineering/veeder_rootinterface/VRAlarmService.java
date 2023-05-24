@@ -53,21 +53,22 @@ public class VRAlarmService extends Service implements ServiceConnection,SerialL
 
         try {
 
+            CommonUtils.LogMessage(TAG, "VRAlarmService started."); // #2238
             SharedPreferences sharedPrefG = getApplicationContext().getSharedPreferences(Constants.SHARED_PREF_NAME, Context.MODE_PRIVATE);
             String VRDeviceType = sharedPrefG.getString("VRDeviceType", "BT");
             String MacAddressForBTVeederRoot = sharedPrefG.getString("MacAddressForBTVeederRoot", "");
             SplashActivity.VR_BT_MAC_ADDR = MacAddressForBTVeederRoot;
 
             Log.i(TAG," VR_polling_interval:"+VR_polling_interval);
-            CommonUtils.LogMessage(TAG, " ~Alarm Triger~ PollingInterval:" + VR_polling_interval);
-
+            CommonUtils.LogMessage(TAG, " ~VRAlarmService~ PollingInterval:" + VR_polling_interval);
 
             if (!VRDeviceType.equalsIgnoreCase("BT")) {
-                CommonUtils.LogMessage(TAG, "AppVersion " + CommonUtils.getVersionCode(ctx)+" VRDeviceType:"+VRDeviceType);
+                CommonUtils.LogMessage(TAG, "AppVersion " + CommonUtils.getVersionCode(ctx) + "; VRDeviceType:" + VRDeviceType);
+                CommonUtils.LogMessage(TAG, "VRAlarmService : starting VR_interface"); // #2238
                 Intent vr_intent = new Intent(getApplicationContext(), VR_interface.class);
                 getApplicationContext().startService(vr_intent);
-            }else {
-                CommonUtils.LogMessage(TAG, "AppVersion " + CommonUtils.getVersionCode(ctx)+" VRDeviceType:"+VRDeviceType+" MacAddressForBTVeederRoot:"+MacAddressForBTVeederRoot);
+            } else {
+                CommonUtils.LogMessage(TAG, "AppVersion " + CommonUtils.getVersionCode(ctx) + "; VRDeviceType:" + VRDeviceType + "; MacAddressForBTVeederRoot:" + MacAddressForBTVeederRoot);
                 CheckIfDevicesIsPaired(MacAddressForBTVeederRoot);
                 CodeBegins();
 
@@ -76,7 +77,7 @@ public class VRAlarmService extends Service implements ServiceConnection,SerialL
                     public void run() {
                         connect("onStartCommand");
                     }
-                },4000);
+                }, 4000);
 
             }
 
@@ -119,14 +120,14 @@ public class VRAlarmService extends Service implements ServiceConnection,SerialL
     //ServiceConnection
     @Override
     public void onServiceConnected(ComponentName name, IBinder binder) {
-        CommonUtils.LogMessage(TAG, " VR onServiceConnected");
+        CommonUtils.LogMessage(TAG, "VR onServiceConnected");
         service = ((SerialService.SerialBinder) binder).getService();
         service.attach(this);
     }
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
-        CommonUtils.LogMessage(TAG, " VR onServiceConnected");
+        CommonUtils.LogMessage(TAG, "VR onServiceDisconnected");
         service = null;
     }
 
@@ -175,10 +176,9 @@ public class VRAlarmService extends Service implements ServiceConnection,SerialL
         CompleteResponse = "";
 
         if (connected == Connected.True) {
-            CommonUtils.LogMessage(TAG, " temp log send command");
             try {
 
-                CommonUtils.LogMessage(TAG, " send: " + str + "\n", null);
+                CommonUtils.LogMessage(TAG, "VRAlarmService: send: " + str + "\n", null);
 
                 byte[] data = new BigInteger(str, 16).toByteArray();
 
@@ -186,7 +186,7 @@ public class VRAlarmService extends Service implements ServiceConnection,SerialL
             } catch (Exception e) {
                 connected = Connected.False;
                 onSerialIoError(e);
-                CommonUtils.LogMessage(TAG, " catch: " + e.getMessage() + "\n", null);
+                CommonUtils.LogMessage(TAG, " send: catch: " + e.getMessage() + "\n", null);
             }
         } else {
             CommonUtils.LogMessage(TAG, " send else BT not connected: " + "\n", null);
@@ -198,10 +198,9 @@ public class VRAlarmService extends Service implements ServiceConnection,SerialL
 
         CompleteResponse = CompleteResponse + respStr;
 
-
         String etx = String.valueOf((char) 3);
         if (respStr.contains(etx)) {
-            CommonUtils.LogMessage(TAG, " receive CompleteResponse: " + CompleteResponse, null);
+            CommonUtils.LogMessage(TAG, "VRAlarmService: receive CompleteResponse: " + CompleteResponse, null);
 
             parseBTresponse(CompleteResponse);
             //tv_display_vr_response.setText(CompleteResponse);
