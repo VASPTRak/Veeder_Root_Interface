@@ -143,6 +143,7 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
                         Log.w(TAG, "Read value:" + new String(value));
                     } catch (Exception ex) {
                         Log.w(TAG, "Read value: null");
+                        CommonUtils.LogMessage(TAG, "VR_interface (onCharacteristicRead): Exception: ", ex);
                         ex.printStackTrace();
                     }
                 }
@@ -155,6 +156,7 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
                     try {
 
                         Log.w(TAG, "Read value: " + new String(value) + " , " + toHexString(value));
+                        CommonUtils.LogMessage(TAG, "VR_interface (onCharacteristicChanged): Read value: " + new String(value) + " , " + toHexString(value)); // #2238
                         if (value[0] == Constants.SOH)  //logic to group together commands split over several lines
                         {
                             response_message = new String(value);
@@ -176,6 +178,7 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
 
                     } catch (Exception ex) {
                         Log.w(TAG, "Read value: null");
+                        CommonUtils.LogMessage(TAG, "VR_interface (onCharacteristicChanged): Exception: ", ex);
                         ex.printStackTrace();
                     }
                 }
@@ -184,12 +187,13 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
                 public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
                     Log.w(TAG, "onCharacteristicWrite received: " + status + characteristic);
 
-
                     byte[] value = characteristic.getValue();
                     try {
                         Log.w(TAG, "Read value:" + new String(value));
+                        CommonUtils.LogMessage(TAG, "VR_interface (onCharacteristicWrite): Read value:" + new String(value));
                     } catch (Exception ex) {
                         Log.w(TAG, "Read value: null");
+                        CommonUtils.LogMessage(TAG, "VR_interface (onCharacteristicWrite): Exception: ", ex);
                         ex.printStackTrace();
                     }
                 }
@@ -306,8 +310,8 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
 
     private void TransactionCompleteFunction(String type, HashMap<String, String> CurrentTank) {
 
-
         try {
+            CommonUtils.LogMessage(TAG, "VR_interface: in TransactionCompleteFunction: type: " + type);
 
             //put the information into a package
             Gson gson = new Gson();
@@ -322,7 +326,6 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
             if (type.equals("inventory")) // send different information for each type of tank poll
             {
                 authString = "Basic " + AppConstants.convertStingToBase64(AppConstants.getOriginalUUID_IMEIFromFile(this) + ":" + userEmail + ":" + "SaveInventoryVeederTankMonitorReading");
-
 
                 VR_Inventory_InfoEntity authEntityClass = new VR_Inventory_InfoEntity();
 
@@ -366,7 +369,7 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
 
                 jsonData = gson.toJson(authEntityClass);
                 System.out.println("AP_FS33 VR_Inventory_InfoEntity......" + jsonData);
-
+                CommonUtils.LogMessage("VR_INTERFACE", "~~VR_Inventory_InfoEntity jsonData: " + jsonData, null);
             } else if (type.equals("delivery")) {
 
                 String currentTankNumber = CurrentTank.get("TankNumber");
@@ -448,7 +451,7 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
                     jsonData = gson.toJson(authEntityClass);
 
                     System.out.println("AP_FS33 VR_Delivery_InfoEntity......" + jsonData);
-                    CommonUtils.LogMessage("VR_INTERFACE", "- VR_Delivery_InfoEntity: " + jsonData, null);
+                    CommonUtils.LogMessage("VR_INTERFACE", "~~VR_Delivery_InfoEntity jsonData: " + jsonData, null);
                 } else {
 
                     CommonUtils.LogMessage("VR_INTERFACE", "- DELIVERY SKIPPED  ", null);
@@ -501,12 +504,14 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
 
                 jsonData = gson.toJson(authEntityClass);
                 System.out.println("AP_FS33 VR_Leak_InfoEntity......" + jsonData);
+                CommonUtils.LogMessage("VR_INTERFACE", "~~VR_Leak_InfoEntity jsonData: " + jsonData, null);
             } else if (type.equals("alarm")) {
                 String[] auths = TransactionCompleteFunction_alarm(CurrentTank);
                 jsonData = auths[0];
                 authString = auths[1];
 
                 System.out.println("AP_FS33 VR_Alarm_InfoEntity......" + jsonData);
+                CommonUtils.LogMessage("VR_INTERFACE", "~~VR_Alarm_InfoEntity jsonData: " + jsonData, null);
             }
 
 
@@ -560,7 +565,7 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
 
         } catch (Exception ex) {
 
-            CommonUtils.LogMessage("APFS33", "AuthTestAsyncTask ", ex);
+            CommonUtils.LogMessage(TAG, "VR_interface: TransactionCompleteFunction Exception: ", ex);
             ex.printStackTrace();
         }
 
@@ -667,13 +672,14 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
     private ArrayList<HashMap<String, String>> parse_VR_response(String responseString) {
         String CommandCode = responseString.substring(0, 4);
         int response_length = responseString.length();
+        CommonUtils.LogMessage(TAG, "VR_interface: parse_VR_response CommandCode: " + CommandCode);
         switch (CommandCode) {
             case "i" + Constants.VR_Inventory_Code: //It is sending the inventory report
                 ArrayList<HashMap<String, String>> Final_Response = new ArrayList<HashMap<String, String>>();
                 String TankNumber = responseString.substring(4, 6);  //This is the numbers queried: tthe details are in the later block
                 String DateTime = responseString.substring(6, 16);
 
-                CommonUtils.LogMessage(TAG, "inv-" + DateTime, null);
+                CommonUtils.LogMessage(TAG, "parse_VR_response: inv-" + DateTime, null);
 
                 int offset = 16;  //keeps track of the number of tanks it is querying.
                 //there may be several entries, so go through them all.
@@ -711,13 +717,12 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
                 ArrayList<HashMap<String, String>> Final_Response_dc = new ArrayList<HashMap<String, String>>();
                 String TankNumber_dc = responseString.substring(4, 6);  //This is the numbers queried: tthe details are in the later block
                 String DateTime_dc = responseString.substring(6, 16);//This is the time of query: tthe details are in the later block
-                CommonUtils.LogMessage(TAG, "del-" + DateTime_dc, null);
+                CommonUtils.LogMessage(TAG, "parse_VR_response del-" + DateTime_dc, null);
 
                 int offset_dc = 16;  //keeps track of the number of tanks it is querying.
                 //there may be several entries, so go through them all.
                 while (offset_dc < response_length - 10) {  //The -10 here is simply to avoid off by one errors in counting the length.
                     // There are 7 charachters at the end that we do not use (2 end message, 4 checksum, one ETX
-
 
                     String Tank_num = responseString.substring(offset_dc, offset_dc + 2);
                     String Prod_Code = responseString.substring(offset_dc + 2, offset_dc + 3);
@@ -763,12 +768,11 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
                 //Also ignore ETX
                 return Final_Response_dc;
 
-
             case "i" + Constants.VR_Leak_Code: //It is sending the leak report
                 ArrayList<HashMap<String, String>> Final_Response_lc = new ArrayList<HashMap<String, String>>();
                 String TankNumber_lc = responseString.substring(4, 6);  //This is the numbers queried: tthe details are in the later block
                 String DateTime_lc = responseString.substring(6, 16);//This is the time of query: tthe details are in the later block
-                CommonUtils.LogMessage(TAG, "leak-" + DateTime_lc, null);
+                CommonUtils.LogMessage(TAG, "parse_VR_response leak-" + DateTime_lc, null);
 
 
                 int offset_lc = 16;  //keeps track of the number of tanks it is querying.
@@ -780,11 +784,11 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
                     String tn = responseString.substring(offset_lc, offset_lc + 2);
                     Responses.put("TankNumber", responseString.substring(offset_lc, offset_lc + 2));
                     String pc = responseString.substring(offset_lc + 2, offset_lc + 3);
-                    Responses.put("ProductCode", responseString.substring(offset_lc + 2, offset_lc + 3));
+                    Responses.put("ProductCode", pc);
                     String sdt = responseString.substring(offset_lc + 3, offset_lc + 13);
-                    Responses.put("StartDateTime", responseString.substring(offset_lc + 3, offset_lc + 13));
+                    Responses.put("StartDateTime", sdt);
                     String hr = responseString.substring(offset_lc + 13, offset_lc + 15);
-                    Responses.put("Hours", responseString.substring(offset_lc + 13, offset_lc + 15));
+                    Responses.put("Hours", hr);
 
                     int num_fields = Integer.parseInt(responseString.substring(offset_lc + 15, offset_lc + 17), 16); //Not all the following must be presnet-this fild tells us how much to expect
                     if (num_fields >= 1)
@@ -826,9 +830,10 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
     }
 
     public void Proccess_all_response(String responseString) {
-        CommonUtils.LogMessage(TAG, "VR_interface Response: " + responseString, null);
+        CommonUtils.LogMessage(TAG, "VR_interface: Proccess_all_response: " + responseString);
 
         String CommandCode = responseString.substring(1, 5);//he first is SOH: ignore it
+        CommonUtils.LogMessage(TAG, "VR_interface: CommandCode: " + CommandCode);
         switch (CommandCode) {
             case "i" + Constants.VR_Inventory_Code: //It is sending the inventory report
                 process_VR_Inventory(responseString);
@@ -878,11 +883,13 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
                     Thread.sleep(10);
                 } catch (Exception ex) {
                     ex.printStackTrace();
+                    CommonUtils.LogMessage(TAG, "VR_interface: process_VR_Inventory inner Exception: ", ex);
                 }
             }
 
             SendToast("Got inventory response", true);
         } catch (Exception ex) {
+            CommonUtils.LogMessage(TAG, "VR_interface: process_VR_Inventory Exception: ", ex);
             ex.printStackTrace();
         }
     }
@@ -916,16 +923,17 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
                     // wait between each upload to make sure collisions don't occur
                     Thread.sleep(10);
                 } catch (Exception ex) {
+                    CommonUtils.LogMessage(TAG, "VR_interface: process_VR_Delivery inner Exception: ", ex);
                     ex.printStackTrace();
                 }
             }
 
             SendToast("Got Delivery response", true);
         } catch (Exception ex) {
+            CommonUtils.LogMessage(TAG, "VR_interface: process_VR_Delivery Exception: ", ex);
             ex.printStackTrace();
         }
     }
-
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -978,7 +986,6 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
 
         return Service.START_STICKY;
     }
@@ -1351,12 +1358,14 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
                     // wait between each upload to make sure collisions don't occur
                     Thread.sleep(10);
                 } catch (Exception ex) {
+                    CommonUtils.LogMessage(TAG, "VR_interface: process_VR_Leak inner Exception: ", ex);
                     ex.printStackTrace();
                 }
             }
 
-            SendToast("Got Delivery response", true);
+            SendToast("Got Leak response", true);
         } catch (Exception ex) {
+            CommonUtils.LogMessage(TAG, "VR_interface: process_VR_Leak inner Exception: ", ex);
             ex.printStackTrace();
         }
     }
@@ -1737,12 +1746,14 @@ public class VR_interface extends BackgroundService implements GoogleApiClient.C
                     // wait between each upload to make sure collisions don't occur
                     Thread.sleep(10);
                 } catch (Exception ex) {
+                    CommonUtils.LogMessage(TAG, "VR_interface: process_VR_Alarm inner Exception: ", ex);
                     ex.printStackTrace();
                 }
             }
 
             SendToast("Got Alarm response", true);
         } catch (Exception ex) {
+            CommonUtils.LogMessage(TAG, "VR_interface: process_VR_Alarm inner Exception: ", ex);
             ex.printStackTrace();
         }
     }

@@ -62,13 +62,14 @@ public class VRAlarmService extends Service implements ServiceConnection,SerialL
             Log.i(TAG," VR_polling_interval:"+VR_polling_interval);
             CommonUtils.LogMessage(TAG, " ~VRAlarmService~ PollingInterval:" + VR_polling_interval);
 
-            if (!VRDeviceType.equalsIgnoreCase("BT")) {
-                CommonUtils.LogMessage(TAG, "AppVersion " + CommonUtils.getVersionCode(ctx) + "; VRDeviceType:" + VRDeviceType);
+            //if (!VRDeviceType.equalsIgnoreCase("BT")) { // #2238
+            if (VRDeviceType.equalsIgnoreCase("BT")) {
+                CommonUtils.LogMessage(TAG, "AppVersion => " + CommonUtils.getVersionCode(ctx) + "; VRDeviceType => " + VRDeviceType + "; MacAddressForBTVeederRoot => " + MacAddressForBTVeederRoot);
                 CommonUtils.LogMessage(TAG, "VRAlarmService : starting VR_interface"); // #2238
                 Intent vr_intent = new Intent(getApplicationContext(), VR_interface.class);
                 getApplicationContext().startService(vr_intent);
             } else {
-                CommonUtils.LogMessage(TAG, "AppVersion " + CommonUtils.getVersionCode(ctx) + "; VRDeviceType:" + VRDeviceType + "; MacAddressForBTVeederRoot:" + MacAddressForBTVeederRoot);
+                CommonUtils.LogMessage(TAG, "AppVersion: " + CommonUtils.getVersionCode(ctx) + "; VRDeviceType: " + VRDeviceType + "; MacAddressForBTVeederRoot: " + MacAddressForBTVeederRoot);
                 CheckIfDevicesIsPaired(MacAddressForBTVeederRoot);
                 CodeBegins();
 

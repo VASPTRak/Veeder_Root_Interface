@@ -1071,11 +1071,12 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
     private void DisplayDashboardEveSecond() {
 
         if (!VRDeviceType.equalsIgnoreCase("BT")) {
-        if (AppConstants.RunningPoll) {
-            btnGo.setBackgroundColor(ContextCompat.getColor(this, R.color.pressed_start_multi));
-        } else {
-            btnGo.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFluid));
-        }}
+            if (AppConstants.RunningPoll) {
+                btnGo.setBackgroundColor(ContextCompat.getColor(this, R.color.pressed_start_multi));
+            } else {
+                btnGo.setBackgroundColor(ContextCompat.getColor(this, R.color.colorFluid));
+            }
+        }
 
 
 //        tv_fs1_Qty.setText(String.valueOf((int) Math.floor(Constants.TankLevel.get(0))));
