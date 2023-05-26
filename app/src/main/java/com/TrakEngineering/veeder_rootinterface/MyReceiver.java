@@ -13,8 +13,7 @@ public class MyReceiver extends BroadcastReceiver {
         try {
             SharedPreferences sharedPrefG = context.getSharedPreferences(Constants.SHARED_PREF_NAME, Context.MODE_PRIVATE);
             String VRDeviceType = sharedPrefG.getString("VRDeviceType", "BT");
-            //if (!VRDeviceType.equalsIgnoreCase("BT")) { // #2238
-            if (VRDeviceType.equalsIgnoreCase("BT")) {
+            if (!VRDeviceType.equalsIgnoreCase("BT")) {
                 CommonUtils.LogMessage("MyReceiver", "MyReceiver : starting VR_interface"); // #2238
                 Intent vr_intent = new Intent(context, VR_interface.class);
                 context.startService(vr_intent);
