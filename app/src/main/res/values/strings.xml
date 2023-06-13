@@ -15,7 +15,7 @@
     <string name="fuel_another">Fuel Another</string>
     <string name="stop_fueling">Stop Fueling</string>
     <string name="fuel_history">Fuel History</string>
-    <string name="regi">Registration</string>
+    <string name="regi">Register</string>
 
     <string name="no_internet">Make sure that you are connected to the Internet</string>
     <string name="title_activity_maps">Map</string>
@@ -142,4 +142,10 @@
     <string name="Qflied">Quantity</string>
     <string name="TLstring">Tank Level: </string>
     <string name="GoButton">Veeder-Root Monitor. Not used for Fueling </string>
+
+    <string name="HUBNameRequired">Please enter HUB Name</string>
+    <string name="HUBNameInvalid">Please enter valid HUB Name</string>
+    <string name="RegistrationSuccess">Thank you for registering.</string>
+    <string name="IMEIAlreadyExist">Your IMEI Number already EXISTS!</string>
+    <string name="CheckInternet">Please check Internet Connection and retry.</string>
 </resources>

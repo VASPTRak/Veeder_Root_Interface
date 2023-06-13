@@ -83,6 +83,8 @@ public class AppConstants {
     public static String HUB_ID = "";
     public static String VRForceReadingSave = "n";
 
+    public static String BT_Level_Command = "01323030";
+    public static String BT_Delivery_Command = "01493230323030";
 
     public static String FS2_CONNECTED_SSID;
 

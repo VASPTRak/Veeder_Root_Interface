@@ -63,12 +63,14 @@ public class RegistrationActivity extends AppCompatActivity {
 
         TextView tvVersionNum = findViewById(R.id.tvVersionNum);
         tvVersionNum.setText("Version " + CommonUtils.getVersionCode(RegistrationActivity.this));
+        CommonUtils.LogMessage("RegistrationAct", "App Version: " + CommonUtils.getVersionCode(RegistrationActivity.this) + " " + AppConstants.getDeviceName() + " Android " + Build.VERSION.RELEASE + " ");
 
         try {
             TelephonyManager tMgr = (TelephonyManager) getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
             String mPhoneNumber = tMgr.getLine1Number();
             etMobile.setText(mPhoneNumber);
-        }catch (Exception e) {
+        } catch (Exception e) {
+            CommonUtils.LogMessage("RegistrationAct", "Exception while getting phone number: " + e.getMessage());
             System.out.println(e.getMessage());
         }
 
@@ -88,9 +90,10 @@ public class RegistrationActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-
                 if (etFName.getText().toString().trim().isEmpty()) {
-                    redToast(RegistrationActivity.this, "Please enter Name");
+                    //redToast(RegistrationActivity.this, "Please enter HUB Name");
+                    CommonUtils.LogMessage("RegistrationAct", getResources().getString(R.string.HUBNameRequired));
+                    CommonUtils.showMessageDilaog(RegistrationActivity.this, "Error Message", getResources().getString(R.string.HUBNameRequired));
                     etFName.requestFocus();
                 }/* else if (etMobile.getText().toString().trim().isEmpty()) {
                     redToast(RegistrationActivity.this, "Please enter Mobile");
@@ -112,13 +115,18 @@ public class RegistrationActivity extends AppCompatActivity {
                 } else if (etCompany.getText().toString().trim().isEmpty()) {
                     redToast(RegistrationActivity.this, "Please enter Company");
                     etCompany.requestFocus();
-                }*/ else {
-
+                }*/
+                else if (!ValidateHUBName(etFName.getText().toString().trim())) {
+                    CommonUtils.LogMessage("RegistrationAct", getResources().getString(R.string.HUBNameInvalid));
+                    CommonUtils.showMessageDilaog(RegistrationActivity.this, "Error Message", getResources().getString(R.string.HUBNameInvalid));
+                    etFName.requestFocus();
+                } else {
+                    CommonUtils.LogMessage("RegistrationAct", "Entered HUB Name: " + etFName.getText().toString());
+                    String hubName = etFName.getText().toString().trim();
                     //------------Collect information for Registration------------------------------
                     //------------------------------------------------------------------------------
-                    storeINFO(RegistrationActivity.this, etFName.getText().toString().trim(), etMobile.getText().toString().trim(), etEmail.getText().toString().trim(), AppConstants.getOriginalUUID_IMEIFromFile(RegistrationActivity.this));
+                    storeINFO(RegistrationActivity.this, hubName, etMobile.getText().toString().trim(), etEmail.getText().toString().trim(), AppConstants.getOriginalUUID_IMEIFromFile(RegistrationActivity.this));
 
-                    String userName = etFName.getText().toString().trim();
                     String userMobile = etMobile.getText().toString().trim();
                     String userEmail = etEmail.getText().toString().trim();
                     String userCompany = etCompany.getText().toString().trim();
@@ -133,15 +141,35 @@ public class RegistrationActivity extends AppCompatActivity {
 
                     SplashActivity.writeIMEI_UUIDInFile(RegistrationActivity.this, imeiNumber); ;
 
-                    new RegisterUser(userName, userMobile, userEmail, imeiNumber, AppConstants.DEVICE_TYPE, userCompany).execute();
-
+                    new RegisterUser(hubName, userMobile, userEmail, imeiNumber, AppConstants.DEVICE_TYPE, userCompany).execute();
 
                     //------------------------------------------------------------------------------
-
 
                 }
             }
         });
+    }
+
+    private boolean ValidateHUBName(String hubName) {
+        boolean isValid = false;
+        try {
+            String number;
+            if (hubName.toUpperCase().startsWith("HUB")) {
+                number = hubName.toUpperCase().replace("HUB", "");
+                //} else if (hubName.toUpperCase().startsWith("SPARE")) {
+                //    number = hubName.toUpperCase().replace("SPARE", "");
+            } else {
+                number = hubName;
+            }
+            String regex = "[0-9]+";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher m = pattern.matcher(number);
+
+            isValid = m.matches();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return isValid;
     }
 
     private static void redToast(Context ctx, String MSg) {
@@ -160,13 +188,12 @@ public class RegistrationActivity extends AppCompatActivity {
         return matcher.matches();
     }
 
-    private void storeINFO(Context context, String name, String mobile, String email, String IMEInum) {
+    public void storeINFO(Context context, String name, String mobile, String email, String IMEInum) {
         SharedPreferences pref;
 
         SharedPreferences.Editor editor;
         pref = context.getSharedPreferences("storeINFO", 0);
         editor = pref.edit();
-
 
         // Storing
         editor.putString("name", name);
@@ -176,17 +203,15 @@ public class RegistrationActivity extends AppCompatActivity {
 
         editor.commit();
 
-
     }
 
-    private void AlertDialogBox(final Context ctx, String message) {
+    public void AlertDialogBox(final Context ctx, String message) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ctx);
         alertDialogBuilder.setMessage(message);
         alertDialogBuilder.setCancelable(false);
         alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int arg1) {
-
 
                         dialog.dismiss();
 
@@ -237,28 +262,24 @@ public class RegistrationActivity extends AppCompatActivity {
 
                // String sendData = userName + "#:#" + userMobile + "#:#" + userEmail + "#:#" + imeiNumber + "#:#" + deviceType + "#:#" + userCompany + "#:#" + "AP";
                 String sendData = userName + "#:#" + userMobile + "#:#" + "" + "#:#" + imeiNumber + "#:#" + deviceType + "#:#" + "" + "#:#" + "AP";
-
+                CommonUtils.LogMessage(TAG, "Registration details => (" + sendData + ")");
                 String AUTH_TOKEN = "Basic " + AppConstants.convertStingToBase64("123:abc:Register");
                 ServerHandler serverHandler = new ServerHandler();
 
                 resp = serverHandler.PostTextData(RegistrationActivity.this, AppConstants.webURL, sendData, AUTH_TOKEN);
 
-
             } catch (Exception e) {
                 Log.d("Ex", e.getMessage());
             }
-
             return resp;
         }
-
 
         @Override
         protected void onPostExecute(String result) {
 
             pd.dismiss();
             try {
-
-                CommonUtils.LogMessage(TAG, " RegisterUser :" + result, new Exception("Test for All"));
+                //CommonUtils.LogMessage(TAG, "RegisterUser :" + result, new Exception("Test for All"));
 
                 JSONObject jsonObj = new JSONObject(result);
 
@@ -266,23 +287,24 @@ public class RegistrationActivity extends AppCompatActivity {
 
                 if (ResponceMessage.equalsIgnoreCase("success")) {
                     CommonUtils.SaveUserInPref(RegistrationActivity.this, userName, userMobile, userEmail, "", "", "", "", "", "", "", "", "", "", "","","");
-
-                    AlertDialogBox(RegistrationActivity.this, "Thank you for registering. \n\nYour request has been sent for the approval. You will be able to proceed with the application after your request has been approved by the administrator.");
+                    CommonUtils.LogMessage(TAG, "Registration successful. Thank you for registering.");
+                    AlertDialogBox(RegistrationActivity.this, getResources().getString(R.string.RegistrationSuccess));
                 } else if (ResponceMessage.equalsIgnoreCase("fail")) {
                     String ResponseText = jsonObj.getString(AppConstants.RES_TEXT);
 
                     AppConstants.AlertDialogBox(RegistrationActivity.this, ResponseText);
 
                 } else if (ResponceMessage.equalsIgnoreCase("exists")) {
-                    AlertDialogBox(RegistrationActivity.this, "Your IMEI Number already EXISTS!");
+                    CommonUtils.LogMessage(TAG, getResources().getString(R.string.IMEIAlreadyExist));
+                    AlertDialogBox(RegistrationActivity.this, getResources().getString(R.string.IMEIAlreadyExist));
                 } else {
-                    AlertDialogBox(RegistrationActivity.this, "Network Error");
+                    CommonUtils.LogMessage(TAG, getResources().getString(R.string.CheckInternet));
+                    AlertDialogBox(RegistrationActivity.this, getResources().getString(R.string.CheckInternet));
                 }
 
-
             } catch (Exception e) {
-
-                CommonUtils.LogMessage(TAG, " RegisterUser :" + result, e);
+                CommonUtils.LogMessage(TAG, "RegisterUser Exception: " + e.getMessage());
+                CommonUtils.LogMessage(TAG, "RegisterUser :" + result, e);
             }
 
         }

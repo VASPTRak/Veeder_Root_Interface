@@ -546,28 +546,26 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
                     String VRDeviceType = jsonObject.getString("VRDeviceType");
                     String MacAddressForBTVeederRoot = jsonObject.getString("MacAddressForBTVeederRoot");
 
-
-
-
                     JSONArray TankArray = jsonObject.getJSONArray("tanksObj");
                     Constants.TankList = new ArrayList<>();
                     for (int i = 0; i < TankArray.length(); i++) {
                         // create a JSONObject for fetching single user data
-                            JSONObject userDetail = TankArray.getJSONObject(i);
+                        JSONObject userDetail = TankArray.getJSONObject(i);
                         // fetch email and name and store it in arraylist
 
                         String TankNumber = userDetail.getString("TankNumber");
                         String TankName = userDetail.getString("TankName");
                         String ScheduleTankReading = userDetail.getString("ScheduleTankReading");
                         String ReceiveDeliveryInformation = userDetail.getString("ReceiveDeliveryInformation");
+                        String TankMonitorNumber = userDetail.getString("TankMonitorNumber");
 
                         HashMap<String,String> map = new HashMap<>();
                         map.put("TankNumber", TankNumber);
                         map.put("TankName", TankName);
                         map.put("ScheduleTankReading", ScheduleTankReading);
                         map.put("ReceiveDeliveryInformation", ReceiveDeliveryInformation);
+                        map.put("TankMonitorNumber", TankMonitorNumber);
                         Constants.TankList.add(map);
-
 
                         VR_polling_interval = Math.max(VR_polling_interval, Integer.parseInt(ScheduleTankReading));
 

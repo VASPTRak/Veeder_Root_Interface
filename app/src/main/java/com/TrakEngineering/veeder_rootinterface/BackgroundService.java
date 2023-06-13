@@ -43,7 +43,7 @@ public class BackgroundService extends Service {
 
         System.out.println("BackgroundService is on....");
 
-        CommonUtils.LogMessage("BackgroundService", "BackgroundService  onStart....", null);
+        CommonUtils.LogMessage("BackgroundService", "BackgroundService started", null);
 
         ArrayList<HashMap<String, String>> StatusData = controller.getAllUpdateTranStatus();
 
