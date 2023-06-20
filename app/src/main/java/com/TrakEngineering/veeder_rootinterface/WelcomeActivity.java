@@ -2075,7 +2075,7 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
         try {
             BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             BluetoothDevice device = bluetoothAdapter.getRemoteDevice(SplashActivity.VR_BT_MAC_ADDR);
-            status("Connecting..." + SplashActivity.VR_BT_MAC_ADDR + " ->" + fromWhr);
+            status("Connecting..." + SplashActivity.VR_BT_MAC_ADDR + " -> " + fromWhr);
             connected = Connected.Pending;
             SerialSocket socket = new SerialSocket(getApplicationContext(), device);
             service.connect(socket);
@@ -2136,7 +2136,7 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
 
             layout_get_vr_readings.setVisibility(View.VISIBLE);
             Log.i(TAG, "Status:" + str);
-            CommonUtils.LogMessage(TAG, " BT status : " + str + "\n", null);
+            CommonUtils.LogMessage(TAG, "BT status : " + str + "\n", null);
 
             if (str.equalsIgnoreCase("Connected")) {
                 linearMac.setVisibility(View.GONE);
@@ -2189,7 +2189,7 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
     @Override
     public void onSerialConnectError(Exception e) {
         stopService(new Intent(this, SerialService.class));
-        status("Disconnect-4" + e.getMessage());
+        status("Disconnect-4 (SerialConnectError): " + e.getMessage());
 
     }
 
@@ -2200,7 +2200,7 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
 
     @Override
     public void onSerialIoError(Exception e) {
-        status("Disconnect-5 " + e.getMessage());
+        status("Disconnect-5 (SerialIoError): " + e.getMessage());
 
     }
 
@@ -2476,11 +2476,11 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
 
                 if (!mBluetoothAdapter.isEnabled()) {
                     mBluetoothAdapter.enable();
-                    CommonUtils.LogMessage(TAG, "Re-establishConnection BT Enabled: ");
+                    CommonUtils.LogMessage(TAG, "Re-establishConnection BT Enabled");
                 }
 
                 btnGo.setBackgroundColor(ContextCompat.getColor(WelcomeActivity.this, R.color.pressed_start_multi));
-                CommonUtils.LogMessage(TAG, "Re-establishConnection Disconnect: ");
+                CommonUtils.LogMessage(TAG, "Re-establishConnection Disconnect");
                 disconnect();
                 Thread.sleep(5000);
                 CommonUtils.LogMessage(TAG, "Re-establishConnection Re-connect ");;
@@ -2558,9 +2558,26 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
             if (ex_vr) {
                 ex_vr = false;
                 Log.i(TAG,"surelockcheck ExactAlarm onReceive");
-                CommonUtils.LogMessage(TAG, "ExactAlarm onReceive");
+                CommonUtils.LogMessage(TAG, "ExactAlarm: onReceive");
                 AppConstants.VRForceReadingSave = "n";
-                GetVRReadingsExactAlarm();
+
+                if (!VRDeviceType.equalsIgnoreCase("BT")) {
+                    CommonUtils.LogMessage(TAG, "AppVersion => " + CommonUtils.getVersionCode(WelcomeActivity.this) + "; VRDeviceType => " + VRDeviceType);
+                    CommonUtils.LogMessage(TAG, "ExactAlarm : starting VR_interface"); // #2238
+                    Intent vr_intent = new Intent(WelcomeActivity.this, VR_interface.class);
+                    startService(vr_intent);
+
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            ex_vr = true;
+                        }
+                    }, 30000);
+                } else {
+                    CommonUtils.LogMessage(TAG, "AppVersion => " + CommonUtils.getVersionCode(WelcomeActivity.this) + "; VRDeviceType => " + VRDeviceType + "; MacAddressForBTVeederRoot => " + MacAddressForBTVeederRoot);
+                    CommonUtils.LogMessage(TAG, "ExactAlarm : GetVRReadingsExactAlarm"); // #2238
+                    GetVRReadingsExactAlarm();
+                }
             }
         }
     }
@@ -2862,6 +2879,7 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
 
                             if (map != null) {
                                 deliveryDataList.add(map);
+                                TankNumber = ""; // Code to get only latest reading for single tank
                             }
                         }
                     }

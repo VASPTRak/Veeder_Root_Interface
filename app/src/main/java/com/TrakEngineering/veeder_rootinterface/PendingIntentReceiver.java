@@ -22,10 +22,10 @@ public class PendingIntentReceiver extends BroadcastReceiver {
             Bundle notificationData = intent.getExtras();
             String Action = intent.getAction(); //Action = GetExactVRReadings
             int AlarmHour = notificationData.getInt("AlarmHour");
-            CommonUtils.LogMessage("TAG", "ExactAlarm current Hour:" + currentTime + " AlarmHour:" + AlarmHour);
-            Log.i("PendingIntent", "surelockcheck ExactAlarm current Hour:" + currentTime + " AlarmHour:" + AlarmHour);
+            CommonUtils.LogMessage("TAG", "ExactAlarm Current_Hour: " + currentTime + "; AlarmHour: " + AlarmHour);
+            Log.i("PendingIntent", "surelockcheck ExactAlarm Current_Hour: " + currentTime + "; AlarmHour: " + AlarmHour);
             if (currentTime == AlarmHour) {
-                CommonUtils.LogMessage("TAG", "ExactAlarm broadcast sent");
+                //CommonUtils.LogMessage("TAG", "ExactAlarm broadcast sent");
                 Log.i("PendingIntent","surelockcheck ExactAlarm broadcast sent");
                 Intent broadcastIntent = new Intent();
                 broadcastIntent.setAction("GetExactVRReadings");
