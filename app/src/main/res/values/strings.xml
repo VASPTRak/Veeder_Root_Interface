@@ -148,4 +148,7 @@
     <string name="RegistrationSuccess">Thank you for registering.</string>
     <string name="IMEIAlreadyExist">Your IMEI Number already EXISTS!</string>
     <string name="CheckInternet">Please check Internet Connection and retry.</string>
+    <string name="askreplacehub">Are you sure you want to replace the HUB?</string>
+    <string name="ReplacementSuccess">Replacement Successful. Please standby for 1 minute to allow the LINKS to connect to this device. If you have any issues, please call into our 24/7 Support.</string>
+
 </resources>

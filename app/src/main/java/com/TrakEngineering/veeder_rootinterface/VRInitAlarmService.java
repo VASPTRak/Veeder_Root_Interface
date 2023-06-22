@@ -9,7 +9,9 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
 import static com.TrakEngineering.veeder_rootinterface.Constants.VR_polling_interval;
@@ -17,6 +19,7 @@ import static com.TrakEngineering.veeder_rootinterface.Constants.VR_polling_inte
 public class VRInitAlarmService extends Service {
 
     private static final String TAG = VRInitAlarmService.class.getSimpleName();
+    SimpleDateFormat sdFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 
     public VRInitAlarmService() {
     }
@@ -153,8 +156,10 @@ public class VRInitAlarmService extends Service {
         PendingIntent pendingIntent1 = PendingIntent.getBroadcast(getApplicationContext(), 1, intent, FLAG_CANCEL_CURRENT);
         AlarmManager exact_alarm_12am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         exact_alarm_12am.cancel(pendingIntent1);
-        CommonUtils.LogMessage(TAG, "VRInitAlarmService: AlarmAt12Am"); // #2238
         exact_alarm_12am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent1);
+
+        Date dt = new Date(cal.getTimeInMillis());
+        CommonUtils.LogMessage(TAG, "VRInitAlarmService: AlarmAt12Am (Alarm set for " + sdFormat.format(dt) + ")"); // #2238
 
     }
 
@@ -183,8 +188,10 @@ public class VRInitAlarmService extends Service {
         PendingIntent pendingIntent2 = PendingIntent.getBroadcast(getApplicationContext(), 2, intent, FLAG_CANCEL_CURRENT);
         AlarmManager exact_alarm_4am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         exact_alarm_4am.cancel(pendingIntent2);
-        CommonUtils.LogMessage(TAG, "VRInitAlarmService: AlarmAt4Am"); // #2238
         exact_alarm_4am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent2);
+
+        Date dt = new Date(cal.getTimeInMillis());
+        CommonUtils.LogMessage(TAG, "VRInitAlarmService: AlarmAt4Am (Alarm set for " + sdFormat.format(dt) + ")"); // #2238
 
     }
 
@@ -213,8 +220,10 @@ public class VRInitAlarmService extends Service {
         PendingIntent pendingIntent3 = PendingIntent.getBroadcast(getApplicationContext(), 3, intent, FLAG_CANCEL_CURRENT);
         AlarmManager exact_alarm_6am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         exact_alarm_6am.cancel(pendingIntent3);
-        CommonUtils.LogMessage(TAG, "VRInitAlarmService: AlarmAt6Am"); // #2238
         exact_alarm_6am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent3);
+
+        Date dt = new Date(cal.getTimeInMillis());
+        CommonUtils.LogMessage(TAG, "VRInitAlarmService: AlarmAt6Am (Alarm set for " + sdFormat.format(dt) + ")"); // #2238
 
     }
 
@@ -243,8 +252,10 @@ public class VRInitAlarmService extends Service {
         PendingIntent pendingIntent4 = PendingIntent.getBroadcast(getApplicationContext(), 4, intent, FLAG_CANCEL_CURRENT);
         AlarmManager exact_alarm_8am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         exact_alarm_8am.cancel(pendingIntent4);
-        CommonUtils.LogMessage(TAG, "VRInitAlarmService: AlarmAt8am"); // #2238
         exact_alarm_8am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent4);
+
+        Date dt = new Date(cal.getTimeInMillis());
+        CommonUtils.LogMessage(TAG, "VRInitAlarmService: AlarmAt8am (Alarm set for " + sdFormat.format(dt) + ")"); // #2238
 
     }
 
@@ -273,8 +284,10 @@ public class VRInitAlarmService extends Service {
         PendingIntent pendingIntent5 = PendingIntent.getBroadcast(getApplicationContext(), 5, intent, FLAG_CANCEL_CURRENT);
         AlarmManager exact_alarm_12pm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         exact_alarm_12pm.cancel(pendingIntent5);
-        CommonUtils.LogMessage(TAG, "VRInitAlarmService: AlarmAt12pm"); // #2238
         exact_alarm_12pm.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent5);
+
+        Date dt = new Date(cal.getTimeInMillis());
+        CommonUtils.LogMessage(TAG, "VRInitAlarmService: AlarmAt12pm (Alarm set for " + sdFormat.format(dt) + ")"); // #2238
 
     }
 
@@ -303,8 +316,10 @@ public class VRInitAlarmService extends Service {
         PendingIntent pendingIntent6 = PendingIntent.getBroadcast(getApplicationContext(), 6, intent, FLAG_CANCEL_CURRENT);
         AlarmManager exact_alarm_4pm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         exact_alarm_4pm.cancel(pendingIntent6);
-        CommonUtils.LogMessage(TAG, "VRInitAlarmService: AlarmAt4pm"); // #2238
         exact_alarm_4pm.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent6);
+
+        Date dt = new Date(cal.getTimeInMillis());
+        CommonUtils.LogMessage(TAG, "VRInitAlarmService: AlarmAt4pm (Alarm set for " + sdFormat.format(dt) + ")"); // #2238
 
     }
 
@@ -333,8 +348,10 @@ public class VRInitAlarmService extends Service {
         PendingIntent pendingIntent7 = PendingIntent.getBroadcast(getApplicationContext(), 7, intent, FLAG_CANCEL_CURRENT);
         AlarmManager exact_alarm_6pm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         exact_alarm_6pm.cancel(pendingIntent7);
-        CommonUtils.LogMessage(TAG, "VRInitAlarmService: AlarmAt6Pm"); // #2238
         exact_alarm_6pm.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent7);
+
+        Date dt = new Date(cal.getTimeInMillis());
+        CommonUtils.LogMessage(TAG, "VRInitAlarmService: AlarmAt6Pm (Alarm set for " + sdFormat.format(dt) + ")"); // #2238
 
     }
 
@@ -363,8 +380,10 @@ public class VRInitAlarmService extends Service {
         PendingIntent pendingIntent8 = PendingIntent.getBroadcast(getApplicationContext(), 8, intent, FLAG_CANCEL_CURRENT);
         AlarmManager exact_alarm_8pm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         exact_alarm_8pm.cancel(pendingIntent8);
-        CommonUtils.LogMessage(TAG, "VRInitAlarmService: AlarmAt8pm"); // #2238
         exact_alarm_8pm.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent8);
+
+        Date dt = new Date(cal.getTimeInMillis());
+        CommonUtils.LogMessage(TAG, "VRInitAlarmService: AlarmAt8pm (Alarm set for " + sdFormat.format(dt) + ")"); // #2238
 
     }
 }

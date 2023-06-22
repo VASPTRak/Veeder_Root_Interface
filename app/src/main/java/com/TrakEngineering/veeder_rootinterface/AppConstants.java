@@ -67,6 +67,7 @@ public class AppConstants {
     public static final String RES_DATA_SSID = "SSIDDataObj";
     public static final String RES_DATA_USER = "objUserData";
     public static final String RES_TEXT = "ResponceText";
+    public static String VALIDATION_FOR_TEXT = "ValidationFailFor";
     //private static final String webIP = "http://103.8.126.241:89/";//test
     public static final String webURL = webIP + "HandlerTrak.ashx";
     public static final String LoginURL = webIP + "LoginHandler.ashx";
@@ -234,12 +235,8 @@ public class AppConstants {
                     @Override
                     public void onClick(DialogInterface dialog, int arg1) {
                         dialog.dismiss();
-
-
                     }
                 }
-
-
         );
 
         AlertDialog alertDialog = alertDialogBuilder.create();

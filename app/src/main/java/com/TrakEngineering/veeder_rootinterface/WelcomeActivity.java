@@ -178,6 +178,7 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
             @Override
             public void run() {
                 ex_vr = true;
+                tv_display_vr_response.setText("");
             }
         }, 60000);
 
@@ -2488,7 +2489,7 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
                /* Thread.sleep(5000);
                 send("01323030");*/
 
-            //Clear response text view in 30 sec
+            //Clear response text view in 60 sec
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -2496,7 +2497,7 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
                     tv_display_vr_response.setText("");
                     // startService(new Intent(WelcomeActivity.this, BackgroundService.class));
                 }
-            }, 30000);
+            }, 60000);
 
         } catch (Exception e) {
             ex_vr = true;
@@ -2555,10 +2556,10 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
         @Override
         public void onReceive(Context context, Intent intent) {
 
+            CommonUtils.LogMessage(TAG, "ExactAlarm: onReceive " + ex_vr);
             if (ex_vr) {
                 ex_vr = false;
                 Log.i(TAG,"surelockcheck ExactAlarm onReceive");
-                CommonUtils.LogMessage(TAG, "ExactAlarm: onReceive");
                 AppConstants.VRForceReadingSave = "n";
 
                 if (!VRDeviceType.equalsIgnoreCase("BT")) {
@@ -2571,6 +2572,7 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
                         @Override
                         public void run() {
                             ex_vr = true;
+                            tv_display_vr_response.setText("");
                         }
                     }, 30000);
                 } else {

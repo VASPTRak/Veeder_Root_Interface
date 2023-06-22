@@ -2,9 +2,11 @@ package com.TrakEngineering.veeder_rootinterface;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -16,6 +18,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -23,17 +26,27 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.TrakEngineering.veeder_rootinterface.enity.ReplaceHUBFromAppEntity;
 import com.TrakEngineering.veeder_rootinterface.server.ServerHandler;
+import com.google.gson.Gson;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
 
 import org.json.JSONObject;
 
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -44,6 +57,7 @@ public class RegistrationActivity extends AppCompatActivity {
     private EditText etCompany;
     private AutoCompleteTextView etEmail;
     private Button btnSubmit;
+    private ConnectionDetector cd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +74,8 @@ public class RegistrationActivity extends AppCompatActivity {
         etCompany = findViewById(R.id.etCompany);
         etEmail = findViewById(R.id.etEmail);
         btnSubmit = findViewById(R.id.btnSubmit);
+
+        cd = new ConnectionDetector(RegistrationActivity.this);
 
         TextView tvVersionNum = findViewById(R.id.tvVersionNum);
         tvVersionNum.setText("Version " + CommonUtils.getVersionCode(RegistrationActivity.this));
@@ -205,7 +221,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
     }
 
-    public void AlertDialogBox(final Context ctx, String message) {
+    public void AlertDialogBox(final Context ctx, String message, boolean isRestart) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ctx);
         alertDialogBuilder.setMessage(message);
         alertDialogBuilder.setCancelable(false);
@@ -215,7 +231,14 @@ public class RegistrationActivity extends AppCompatActivity {
 
                         dialog.dismiss();
 
-                        finish();
+                        if (isRestart) {
+                            CommonUtils.LogMessage("RegistrationAct", "<Restarting the app after registration.>");
+                            Intent i = new Intent(RegistrationActivity.this, SplashActivity.class);
+                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(i);
+                        } else {
+                            finish();
+                        }
                     }
                 }
 
@@ -288,28 +311,167 @@ public class RegistrationActivity extends AppCompatActivity {
                 if (ResponceMessage.equalsIgnoreCase("success")) {
                     CommonUtils.SaveUserInPref(RegistrationActivity.this, userName, userMobile, userEmail, "", "", "", "", "", "", "", "", "", "", "","","");
                     CommonUtils.LogMessage(TAG, "Registration successful. Thank you for registering.");
-                    AlertDialogBox(RegistrationActivity.this, getResources().getString(R.string.RegistrationSuccess));
+                    AlertDialogBox(RegistrationActivity.this, getResources().getString(R.string.RegistrationSuccess), true);
                 } else if (ResponceMessage.equalsIgnoreCase("fail")) {
                     String ResponseText = jsonObj.getString(AppConstants.RES_TEXT);
+                    String ValidationFailFor = jsonObj.getString(AppConstants.VALIDATION_FOR_TEXT);
 
-                    AppConstants.AlertDialogBox(RegistrationActivity.this, ResponseText);
+                    if (ValidationFailFor.equalsIgnoreCase("askreplacehub")) {
+                        CommonUtils.LogMessage(TAG, "Registration fail: Asking for Replacement");
+                        CustomMessage2Input(RegistrationActivity.this, getString(R.string.askreplacehub));
+                    } else {
+                        CommonUtils.LogMessage(TAG, "Registration fail. " + ResponseText);
+                        AppConstants.AlertDialogBox(RegistrationActivity.this, ResponseText);
+                    }
 
                 } else if (ResponceMessage.equalsIgnoreCase("exists")) {
                     CommonUtils.LogMessage(TAG, getResources().getString(R.string.IMEIAlreadyExist));
-                    AlertDialogBox(RegistrationActivity.this, getResources().getString(R.string.IMEIAlreadyExist));
+                    AlertDialogBox(RegistrationActivity.this, getResources().getString(R.string.IMEIAlreadyExist), false);
                 } else {
                     CommonUtils.LogMessage(TAG, getResources().getString(R.string.CheckInternet));
-                    AlertDialogBox(RegistrationActivity.this, getResources().getString(R.string.CheckInternet));
+                    AlertDialogBox(RegistrationActivity.this, getResources().getString(R.string.CheckInternet), false);
                 }
 
             } catch (Exception e) {
                 CommonUtils.LogMessage(TAG, "RegisterUser Exception: " + e.getMessage());
-                CommonUtils.LogMessage(TAG, "RegisterUser :" + result, e);
+                CommonUtils.LogMessage(TAG, "RegisterUser : " + result, e);
             }
-
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void CustomMessage2Input(final Activity context, String message) {
 
+        androidx.appcompat.app.AlertDialog.Builder alertDialogBuilder = new androidx.appcompat.app.AlertDialog.Builder(context);
+        alertDialogBuilder.setMessage(message);
+        alertDialogBuilder.setCancelable(false);
+
+        alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int arg1) {
+                        dialog.dismiss();
+                        CommonUtils.LogMessage("RegisterUser", "Replacement confirmation -> Yes");
+
+                        // HUB Replace server call
+                        String hubName = etFName.getText().toString().trim();
+                        String userName = "";
+                        String userPass = "";
+                        String imeiNumber = AppConstants.getOriginalUUID_IMEIFromFile(RegistrationActivity.this);
+                        String userMobile = etMobile.getText().toString().trim();
+
+                        if (imeiNumber.isEmpty()) {
+                            CommonUtils.LogMessage("RegisterUser", "Your IMEI Number is Empty!");
+                            AlertDialogBox(RegistrationActivity.this, "Your IMEI Number is Empty!", false);
+                        } else if (cd.isConnectingToInternet()) {
+                            new ReplaceHUBFromApp().execute(hubName, imeiNumber, userName, userPass, userMobile);
+                        } else {
+                            CommonUtils.showNoInternetDialog(RegistrationActivity.this);
+                        }
+                    }
+                }
+        );
+
+        alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int arg1) {
+                        dialog.dismiss();
+                        CommonUtils.LogMessage("RegisterUser", "Replacement confirmation -> No");
+
+                        InputMethodManager imm = (InputMethodManager) context.getSystemService(INPUT_METHOD_SERVICE);
+                        imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_IMPLICIT_ONLY);
+                    }
+                }
+        );
+        androidx.appcompat.app.AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
+    public class ReplaceHUBFromApp extends AsyncTask<String, Void, String> {
+
+        private static final String TAG = "ReplaceHUBFromApp :";
+        public String resp = "";
+        ProgressDialog pd;
+
+        @Override
+        protected void onPreExecute() {
+            pd = new ProgressDialog(RegistrationActivity.this);
+            pd.setMessage("Please wait...");
+            pd.setCancelable(false);
+            pd.show();
+        }
+
+        protected String doInBackground(String... param) {
+
+            try {
+                MediaType TEXT = MediaType.parse("application/x-www-form-urlencoded");
+
+                OkHttpClient client = new OkHttpClient();
+                client.setConnectTimeout(4, TimeUnit.SECONDS);
+                client.setReadTimeout(4, TimeUnit.SECONDS);
+                client.setWriteTimeout(4, TimeUnit.SECONDS);
+
+                ReplaceHUBFromAppEntity objEntityClass = new ReplaceHUBFromAppEntity();
+                objEntityClass.hubName = param[0];
+                objEntityClass.deviceId = param[1];
+                objEntityClass.userName = param[2];
+                objEntityClass.password = param[3];
+                objEntityClass.devicePhoneNumber = param[4];
+
+                Gson gson = new Gson();
+                String jsonData = gson.toJson(objEntityClass);
+                String userEmail = CommonUtils.getCustomerDetails(RegistrationActivity.this).PersonEmail;
+
+                String authString = "Basic " + AppConstants.convertStingToBase64(objEntityClass.deviceId + ":" + userEmail + ":" + "ReplaceHUBFromApp");
+
+                RequestBody body = RequestBody.create(TEXT, jsonData);
+                Request request = new Request.Builder()
+                        .url(AppConstants.webURL)
+                        .post(body)
+                        .addHeader("Authorization", authString)
+                        .build();
+
+                Response response = client.newCall(request).execute();
+                resp = response.body().string();
+
+            } catch (SocketTimeoutException e) {
+                e.printStackTrace();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return resp;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+
+            pd.dismiss();
+            try {
+
+                JSONObject jsonObj = new JSONObject(result);
+                String ResponceMessage = jsonObj.getString("ResponseMessage");
+
+                if (ResponceMessage.equalsIgnoreCase("success")) {
+                    //CommonUtils.SaveUserInPref(RegistrationActivity.this, userName, userMobile, userEmail, "","","","","", "", "","","", FluidSecureSiteName,ISVehicleHasFob, IsPersonHasFob,IsVehicleNumberRequire, Integer.parseInt(WifiChannelToUse),"","","");
+                    CommonUtils.LogMessage(TAG, "Replacement successful."); // Thank you for registering.
+                    AlertDialogBox(RegistrationActivity.this, getResources().getString(R.string.ReplacementSuccess), true);
+
+                } else if (ResponceMessage.equalsIgnoreCase("fail")) {
+                    String ResponseText = jsonObj.getString("ResponseText");
+                    CommonUtils.LogMessage(TAG, "Replacement fail: " + ResponseText);
+                    AppConstants.AlertDialogBox(RegistrationActivity.this, ResponseText);
+
+                } else if (ResponceMessage.equalsIgnoreCase("exists")) {
+                    CommonUtils.LogMessage(TAG, getResources().getString(R.string.IMEIAlreadyExist));
+                    AlertDialogBox(RegistrationActivity.this, getResources().getString(R.string.IMEIAlreadyExist), false);
+                } else {
+                    CommonUtils.LogMessage(TAG, getResources().getString(R.string.CheckInternet));
+                    AlertDialogBox(RegistrationActivity.this, getResources().getString(R.string.CheckInternet), false);
+                }
+            } catch (Exception e) {
+                CommonUtils.LogMessage(TAG, " ReplaceHUBFromApp Exception:" + result, e);
+            }
+        }
+    }
 
 }
