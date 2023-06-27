@@ -49,7 +49,7 @@ import java.util.UUID;
 
 import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
 import static com.TrakEngineering.veeder_rootinterface.AppConstants.Login_Email;
-import static com.TrakEngineering.veeder_rootinterface.AppConstants.ReceiveDeliveryInformation;
+//import static com.TrakEngineering.veeder_rootinterface.AppConstants.ReceiveDeliveryInformation;
 import static com.TrakEngineering.veeder_rootinterface.Constants.VR_polling_interval;
 import static java.lang.System.console;
 import static java.lang.System.currentTimeMillis;

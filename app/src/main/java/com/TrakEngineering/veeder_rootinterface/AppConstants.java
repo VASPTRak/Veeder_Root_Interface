@@ -44,7 +44,7 @@ public class AppConstants {
 
     public static final String DEVICE_TYPE = "A";
     public static final String USER_NAME = "userName";
-    public static final String ReceiveDeliveryInformation = "ReceiveDeliveryInformation";
+    //public static final String ReceiveDeliveryInformation = "ReceiveDeliveryInformation";
     public static final String USER_MOBILE = "userMobile";
     public static final String USER_EMAIL = "userEmail";
     public static final String IsOdoMeterRequire = "IsOdoMeterRequire";
@@ -118,6 +118,7 @@ public class AppConstants {
     public static boolean NeedToRename;
     public static boolean BUSY_STATUS;
 
+    public static boolean ReceiveDeliveryInformation = false;
 
     public static boolean IS_WIFI_ON;
     public static boolean IS_DATA_ON;

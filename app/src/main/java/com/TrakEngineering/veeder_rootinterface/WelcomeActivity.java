@@ -2120,13 +2120,31 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
 
             if (current_Command.equalsIgnoreCase(AppConstants.BT_Level_Command)) {
                 CommonUtils.LogMessage(TAG, "Parsing LEVEL Response", null);
-                parseBTresponse(CompleteResponse);
+                parseBTLevelResponse(CompleteResponse);
                 tv_display_vr_response.setText(CompleteResponse);
+
+                if (!AppConstants.ReceiveDeliveryInformation) {
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            CommonUtils.LogMessage(TAG, "Rescheduling for further readings.");
+                            InitializeVRService();
+                        }
+                    }, 30000);
+                }
 
             } else if (current_Command.equalsIgnoreCase(AppConstants.BT_Delivery_Command)) {
                 CommonUtils.LogMessage(TAG, "Parsing DELIVERY Response", null);
                 ParseBTDeliveryResponse(CompleteResponse); // To Parse Delivery response.
                 tv_display_vr_response.setText(CompleteResponse);
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        CommonUtils.LogMessage(TAG, "Rescheduling for further readings");
+                        InitializeVRService();
+                    }
+                }, 30000);
             }
         }
     }
@@ -2175,16 +2193,19 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
         status("Connected");
         connected = Connected.True;
         CommonUtils.LogMessage(TAG, "Sending commands from onSerialConnect.");
+        CommonUtils.LogMessage(TAG, "Sending command to get Levels");
         send(AppConstants.BT_Level_Command);  //Temp commented to check
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // Send BT command to get Deliveries
-                send(AppConstants.BT_Delivery_Command);
-            }
-        }, 30000);
-
+        if (AppConstants.ReceiveDeliveryInformation) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    // Send BT command to get Deliveries
+                    CommonUtils.LogMessage(TAG, "Sending command to get Deliveries");
+                    send(AppConstants.BT_Delivery_Command);
+                }
+            }, 30000);
+        }
     }
 
     @Override
@@ -2220,7 +2241,7 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
         }
     }
 
-    public void parseBTresponse(String allResp) {
+    public void parseBTLevelResponse(String allResp) {
 
         try {
             /*
@@ -2410,15 +2431,19 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
                 //If VR-Connected execute command
                 if (connected == Connected.True) {
                     CommonUtils.LogMessage(TAG, "Sending commands from GetVRReadingsManually: BT_Status: Connected");
+                    CommonUtils.LogMessage(TAG, "Sending command to get Levels");
                     send(vr_command);//vr_command
 
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            // Send BT command to get Deliveries
-                            send(AppConstants.BT_Delivery_Command);
-                        }
-                    }, 30000);
+                    if (AppConstants.ReceiveDeliveryInformation) {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                // Send BT command to get Deliveries
+                                CommonUtils.LogMessage(TAG, "Sending command to get Deliveries");
+                                send(AppConstants.BT_Delivery_Command);
+                            }
+                        }, 30000);
+                    }
                 } else {
 
                     if (!mBluetoothAdapter.isEnabled()) {
@@ -2694,13 +2719,15 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
         calendar.set(Calendar.HOUR_OF_DAY, 23);
         calendar.set(Calendar.MINUTE, 10);
 
-        AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                60000 * 60 * 24, pendingIntent);
         if (calendar.after(Calendar.getInstance())) {
             CommonUtils.LogMessage(TAG, "InitializeVRService : starting VRInitAlarmService"); // #2238
             this.startService(new Intent(WelcomeActivity.this, VRInitAlarmService.class));
         }
+
+        AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+        alarmManager.cancel(pendingIntent);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                60000 * 60 * 24, pendingIntent);
     }
 
     public void ParseBTDeliveryResponse(String response) {

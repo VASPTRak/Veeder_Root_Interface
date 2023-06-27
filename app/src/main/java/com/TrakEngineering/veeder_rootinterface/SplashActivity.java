@@ -53,7 +53,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import static androidx.core.content.ContextCompat.getSystemService;
-import static com.TrakEngineering.veeder_rootinterface.AppConstants.ReceiveDeliveryInformation;
+//import static com.TrakEngineering.veeder_rootinterface.AppConstants.ReceiveDeliveryInformation;
 import static com.TrakEngineering.veeder_rootinterface.Constants.VR_polling_interval;
 
 //import com.TrakEngineering.veeder_rootinterface.server.GPSTracker;
@@ -513,120 +513,128 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
     private void actionOnResult(String response) {
 
         try {
+            AppConstants.ReceiveDeliveryInformation = false;
 
+            if (response != null && !response.isEmpty()) {
+                JSONObject jsonObj = new JSONObject(response);
 
-            JSONObject jsonObj = new JSONObject(response);
+                String ResponceMessage = jsonObj.getString(AppConstants.RES_MESSAGE);
 
-            String ResponceMessage = jsonObj.getString(AppConstants.RES_MESSAGE);
+                if (ResponceMessage.equalsIgnoreCase("success")) {
 
-            if (ResponceMessage.equalsIgnoreCase("success")) {
+                    String userData = jsonObj.getString(AppConstants.RES_DATA_USER);
 
-                String userData = jsonObj.getString(AppConstants.RES_DATA_USER);
+                    try {
+                        //VR_BT_MAC_ADDR = "";//"00:14:03:05:F2:9B";
 
-                try {
-                   //VR_BT_MAC_ADDR = "";//"00:14:03:05:F2:9B";
+                        JSONObject jsonObject = new JSONObject(userData);
 
-                    JSONObject jsonObject = new JSONObject(userData);
+                        String userName = jsonObject.getString("PersonName");
+                        String userMobile = jsonObject.getString("PhoneNumber");
+                        String userEmail = jsonObject.getString("Email");
+                        String IsApproved = jsonObject.getString("IsApproved");
+                        String IMEI_UDID = jsonObject.getString("IMEI_UDID");
+                        String FluidSecureSiteName = jsonObject.getString("FluidSecureSiteName");
 
-                    String userName = jsonObject.getString("PersonName");
-                    String userMobile = jsonObject.getString("PhoneNumber");
-                    String userEmail = jsonObject.getString("Email");
-                    String IsApproved = jsonObject.getString("IsApproved");
-                    String IMEI_UDID = jsonObject.getString("IMEI_UDID");
-                    String FluidSecureSiteName = jsonObject.getString("FluidSecureSiteName");
+                        String IsLoginRequire = jsonObject.getString("IsLoginRequire");
+                        String IsDepartmentRequire = jsonObject.getString("IsDepartmentRequire");
+                        String IsPersonnelPINRequire = jsonObject.getString("IsPersonnelPINRequire");
+                        String IsOtherRequire = jsonObject.getString("IsOtherRequire");
+                        String OtherLabel = jsonObject.getString("OtherLabel");
+                        String TimeOut = jsonObject.getString("TimeOut");
+                        String HubId = jsonObject.getString("PersonId");
+                        String IsPersonnelPINRequireForHub = jsonObject.getString("IsPersonnelPINRequireForHub");
+                        String VRDeviceType = jsonObject.getString("VRDeviceType");
+                        String MacAddressForBTVeederRoot = jsonObject.getString("MacAddressForBTVeederRoot");
 
-                    String IsLoginRequire = jsonObject.getString("IsLoginRequire");
-                    String IsDepartmentRequire = jsonObject.getString("IsDepartmentRequire");
-                    String IsPersonnelPINRequire = jsonObject.getString("IsPersonnelPINRequire");
-                    String IsOtherRequire = jsonObject.getString("IsOtherRequire");
-                    String OtherLabel = jsonObject.getString("OtherLabel");
-                    String TimeOut = jsonObject.getString("TimeOut");
-                    String HubId = jsonObject.getString("PersonId");
-                    String IsPersonnelPINRequireForHub = jsonObject.getString("IsPersonnelPINRequireForHub");
-                    String VRDeviceType = jsonObject.getString("VRDeviceType");
-                    String MacAddressForBTVeederRoot = jsonObject.getString("MacAddressForBTVeederRoot");
+                        JSONArray TankArray = jsonObject.getJSONArray("tanksObj");
+                        Constants.TankList = new ArrayList<>();
+                        for (int i = 0; i < TankArray.length(); i++) {
+                            // create a JSONObject for fetching single user data
+                            JSONObject userDetail = TankArray.getJSONObject(i);
+                            // fetch email and name and store it in arraylist
 
-                    JSONArray TankArray = jsonObject.getJSONArray("tanksObj");
-                    Constants.TankList = new ArrayList<>();
-                    for (int i = 0; i < TankArray.length(); i++) {
-                        // create a JSONObject for fetching single user data
-                        JSONObject userDetail = TankArray.getJSONObject(i);
-                        // fetch email and name and store it in arraylist
+                            String TankNumber = userDetail.getString("TankNumber");
+                            String TankName = userDetail.getString("TankName");
+                            String ScheduleTankReading = userDetail.getString("ScheduleTankReading");
+                            String ReceiveDeliveryInformation = userDetail.getString("ReceiveDeliveryInformation");
+                            String TankMonitorNumber = userDetail.getString("TankMonitorNumber");
 
-                        String TankNumber = userDetail.getString("TankNumber");
-                        String TankName = userDetail.getString("TankName");
-                        String ScheduleTankReading = userDetail.getString("ScheduleTankReading");
-                        String ReceiveDeliveryInformation = userDetail.getString("ReceiveDeliveryInformation");
-                        String TankMonitorNumber = userDetail.getString("TankMonitorNumber");
+                            HashMap<String, String> map = new HashMap<>();
+                            map.put("TankNumber", TankNumber);
+                            map.put("TankName", TankName);
+                            map.put("ScheduleTankReading", ScheduleTankReading);
+                            map.put("ReceiveDeliveryInformation", ReceiveDeliveryInformation);
+                            map.put("TankMonitorNumber", TankMonitorNumber);
+                            Constants.TankList.add(map);
 
-                        HashMap<String,String> map = new HashMap<>();
-                        map.put("TankNumber", TankNumber);
-                        map.put("TankName", TankName);
-                        map.put("ScheduleTankReading", ScheduleTankReading);
-                        map.put("ReceiveDeliveryInformation", ReceiveDeliveryInformation);
-                        map.put("TankMonitorNumber", TankMonitorNumber);
-                        Constants.TankList.add(map);
+                            if (!AppConstants.ReceiveDeliveryInformation) {
+                                if (ReceiveDeliveryInformation.equalsIgnoreCase("True")) {
+                                    AppConstants.ReceiveDeliveryInformation = true;
+                                }
+                            }
+                            VR_polling_interval = Math.max(VR_polling_interval, Integer.parseInt(ScheduleTankReading));
 
-                        VR_polling_interval = Math.max(VR_polling_interval, Integer.parseInt(ScheduleTankReading));
+                        }
 
-                    }
+                        if (IsApproved.equalsIgnoreCase("True")) {
+                            CommonUtils.SaveUserInPref(SplashActivity.this, userName, userMobile, userEmail, "", IsDepartmentRequire, IsPersonnelPINRequire, IsOtherRequire, "", OtherLabel, TimeOut, HubId, IsPersonnelPINRequireForHub, FluidSecureSiteName, "False", VRDeviceType, MacAddressForBTVeederRoot);
 
-                    if (IsApproved.equalsIgnoreCase("True")) {
-                        CommonUtils.SaveUserInPref(SplashActivity.this, userName, userMobile, userEmail, "", IsDepartmentRequire, IsPersonnelPINRequire, IsOtherRequire, "", OtherLabel, TimeOut, HubId, IsPersonnelPINRequireForHub, FluidSecureSiteName, ReceiveDeliveryInformation,VRDeviceType,MacAddressForBTVeederRoot);
+                            if (IsLoginRequire.trim().equalsIgnoreCase("True")) {
+                                AppConstants.Login_Email = userEmail;
+                                AppConstants.Login_IMEI = IMEI_UDID;
+                                startActivity(new Intent(SplashActivity.this, Login.class));
+                                finish();
+                            } else {
 
-                        if (IsLoginRequire.trim().equalsIgnoreCase("True")) {
-                            AppConstants.Login_Email = userEmail;
-                            AppConstants.Login_IMEI = IMEI_UDID;
-                            startActivity(new Intent(SplashActivity.this, Login.class));
-                            finish();
-                        } else {
-
-                            startActivity(new Intent(SplashActivity.this, WelcomeActivity.class));
-                            finish();
+                                startActivity(new Intent(SplashActivity.this, WelcomeActivity.class));
+                                finish();
 
                             /*startActivity(new Intent(SplashActivity.this, DisplayTest.class));
                             finish();*/
+                            }
+
+                        } else {
+                            CommonUtils.showMessageDilaog(SplashActivity.this, "Error Message", "You are not Approved yet!");
                         }
 
-                    } else {
-                        CommonUtils.showMessageDilaog(SplashActivity.this, "Error Message", "You are not Approved yet!");
+
+                    } catch (Exception ex) {
+                        CommonUtils.LogMessage(TAG, "Handle user Data", ex);
                     }
 
 
-                } catch (Exception ex) {
-                    CommonUtils.LogMessage(TAG, "Handle user Data", ex);
-                }
+                } else if (ResponceMessage.equalsIgnoreCase("fail")) {
+
+                    String ResponceText = jsonObj.getString(AppConstants.RES_TEXT);
+
+                    if (ResponceText.equalsIgnoreCase("New Registration")) {
+
+                        startActivity(new Intent(SplashActivity.this, RegistrationActivity.class));
+                        finish();
 
 
-            } else if (ResponceMessage.equalsIgnoreCase("fail")) {
+                    } else if (ResponceText.equalsIgnoreCase("notapproved")) {
 
-                String ResponceText = jsonObj.getString(AppConstants.RES_TEXT);
-
-                if (ResponceText.equalsIgnoreCase("New Registration")) {
-
-                    startActivity(new Intent(SplashActivity.this, RegistrationActivity.class));
-                    finish();
+                        AlertDialogBox(SplashActivity.this, "Your Registration request is not approved yet.\nIt is marked Inactive in the Company Software.\nPlease contact your companyâ€™s administrator.");
+                    } else if (ResponceText.equalsIgnoreCase("IMEI not exists")) {
 
 
-                } else if (ResponceText.equalsIgnoreCase("notapproved")) {
+                        CommonUtils.showMessageDilaog(SplashActivity.this, "Error Message", ResponceText);
 
-                    AlertDialogBox(SplashActivity.this, "Your Registration request is not approved yet.\nIt is marked Inactive in the Company Software.\nPlease contact your companyâ€™s administrator.");
-                } else if (ResponceText.equalsIgnoreCase("IMEI not exists")) {
+                    } else if (ResponceText.equalsIgnoreCase("No data found")) {
+                        CommonUtils.showMessageDilaog(SplashActivity.this, "Error Message", ResponceText);
 
-
-                    CommonUtils.showMessageDilaog(SplashActivity.this, "Error Message", ResponceText);
-
-                } else if (ResponceText.equalsIgnoreCase("No data found")) {
-                    CommonUtils.showMessageDilaog(SplashActivity.this, "Error Message", ResponceText);
+                    } else {
+                        CommonUtils.showMessageDilaog(SplashActivity.this, "Error Message", ResponceText);
+                    }
 
                 } else {
-                    CommonUtils.showMessageDilaog(SplashActivity.this, "Error Message", ResponceText);
+                    CommonUtils.showMessageDilaog(SplashActivity.this, "Fuel Secure", "No Internet");
                 }
-
             } else {
-                CommonUtils.showMessageDilaog(SplashActivity.this, "Fuel Secure", "No Internet");
+                AppConstants.AlertDialogFinish(SplashActivity.this, "Server response is empty. Please try again later.");
             }
-
 
         } catch (Exception e) {
             CommonUtils.LogMessage(TAG, " CheckApproved Exception ", e);
@@ -664,7 +672,6 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
                     Toast.makeText(SplashActivity.this, "Permission Granted, Now you can access app.", Toast.LENGTH_SHORT).show();
 
                 } else {
-
 
                     CommonUtils.showMessageDilaogFinish(SplashActivity.this, "No read state for Storage.", "Please enable 'Read Storage Permission' for this app to continue.");
 

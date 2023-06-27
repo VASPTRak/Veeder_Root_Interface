@@ -138,15 +138,19 @@ public class VRAlarmService extends Service implements ServiceConnection,SerialL
         status("Connected");
         connected = Connected.True;
         CommonUtils.LogMessage(TAG, "VRAlarmService: Sending commands from onSerialConnect.");
+        CommonUtils.LogMessage(TAG, "Sending command to get Levels");
         send(AppConstants.BT_Level_Command);  //Temp commented to check
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // Send BT command to get Deliveries
-                send(AppConstants.BT_Delivery_Command);
-            }
-        }, 30000);
+        if (AppConstants.ReceiveDeliveryInformation) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    // Send BT command to get Deliveries
+                    CommonUtils.LogMessage(TAG, "Sending command to get Deliveries");
+                    send(AppConstants.BT_Delivery_Command);
+                }
+            }, 30000);
+        }
     }
 
     @Override

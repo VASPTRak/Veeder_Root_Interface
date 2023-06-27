@@ -309,7 +309,7 @@ class CommonUtils {
 
         SharedPreferences sharedPref = activity.getSharedPreferences(Constants.SHARED_PREF_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(AppConstants.ReceiveDeliveryInformation, ReceiveDeliveryInformation);
+        editor.putString("ReceiveDeliveryInformation", ReceiveDeliveryInformation);
         editor.putString(AppConstants.USER_NAME, userName);
         editor.putString(AppConstants.USER_MOBILE, userMobile);
         editor.putString(AppConstants.USER_EMAIL, userEmail);
