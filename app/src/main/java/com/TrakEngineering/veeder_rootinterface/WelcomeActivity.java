@@ -2124,11 +2124,11 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
                 tv_display_vr_response.setText(CompleteResponse);
 
                 if (!AppConstants.ReceiveDeliveryInformation) {
-                    new Handler().postDelayed(new Runnable() {
+                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            CommonUtils.LogMessage(TAG, "Rescheduling for further readings.");
-                            InitializeVRService();
+                            CommonUtils.LogMessage(TAG, "Rescheduling alarms for further readings.");
+                            InitializeVRInitAlarmService();
                         }
                     }, 30000);
                 }
@@ -2138,15 +2138,21 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
                 ParseBTDeliveryResponse(CompleteResponse); // To Parse Delivery response.
                 tv_display_vr_response.setText(CompleteResponse);
 
-                new Handler().postDelayed(new Runnable() {
+                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        CommonUtils.LogMessage(TAG, "Rescheduling for further readings");
-                        InitializeVRService();
+                        CommonUtils.LogMessage(TAG, "Rescheduling alarms for further readings");
+                        InitializeVRInitAlarmService();
                     }
                 }, 30000);
             }
         }
+    }
+
+    private void InitializeVRInitAlarmService() {
+
+        CommonUtils.LogMessage(TAG, "InitializeVRService : starting VRInitAlarmService"); // #2238
+        this.startService(new Intent(WelcomeActivity.this, VRInitAlarmService.class));
     }
 
     private void status(String str) {
