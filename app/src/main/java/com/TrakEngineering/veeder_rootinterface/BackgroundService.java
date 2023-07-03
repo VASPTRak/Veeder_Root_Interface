@@ -202,7 +202,8 @@ public class BackgroundService extends Service {
                 String ResponceMessage = jsonObj.getString(AppConstants.RES_MESSAGE);
                 String ResponceText = jsonObj.getString(AppConstants.RES_TEXT);
 
-                CommonUtils.LogMessage("", " uploadTransactions: id: "+Id +"---" + ResponceMessage + " " + ResponceText + jsonData, null);
+                //CommonUtils.LogMessage("", " uploadTransactions: id: "+Id +"---" + ResponceMessage + " " + ResponceText + jsonData, null);
+                CommonUtils.LogMessage("", " uploadTransactions: id: "+Id +"---" + ResponceMessage + " " + ResponceText, null);
 
 
                 if (ResponceMessage.equalsIgnoreCase("success") || ResponceMessage.equalsIgnoreCase("fail")) {

@@ -436,6 +436,7 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
     protected void onStop() {
         super.onStop();
 
+        CommonUtils.LogMessage(TAG, "in onStop");
         Log.i(TAG,"surelockcheck onStop");
         if (loading != null) {
             loading.dismiss();
@@ -1991,7 +1992,7 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
     @Override
     public void onDestroy() {
         super.onDestroy();
-
+        CommonUtils.LogMessage(TAG, "in onDestroy");
         Log.i(TAG,"surelockcheck onDestroy");
         if (VRDeviceType.equalsIgnoreCase("BT")){
 
@@ -2914,7 +2915,8 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
 
                             if (map != null) {
                                 deliveryDataList.add(map);
-                                TankNumber = ""; // Code to get only latest reading for single tank
+                                //TankNumber = ""; // Code to get only latest reading for single tank
+                                // Commented above line as per #2238 => JOHN 6-30-23  Save all the deliveries
                             }
                         }
                     }
@@ -2933,6 +2935,14 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
                     TankNumberListToReceiveDelivery.add(tankNumber);
                     TankMonitorNumberListToReceiveDelivery.add(TankMonitorNumber);
                 }
+            }
+
+            // Sort readings by START DateTime
+            try {
+                deliveryDataList.sort(new HashMapComparator("StartDateTime"));
+            } catch (Exception e) {
+                Log.e(TAG, "ParseBTDeliveryResponse: Exception while sorting readings: " + e.getMessage());
+                CommonUtils.LogMessage(TAG, "ParseBTDeliveryResponse: Exception while sorting readings: " + e.getMessage(), null);
             }
 
             for (int i = 0; i < deliveryDataList.size(); i++) {
