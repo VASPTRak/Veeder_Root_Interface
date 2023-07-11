@@ -132,6 +132,7 @@
             </intent-filter>
         </receiver>
         <receiver android:name=".PendingIntentReceiver" />
+        <receiver android:name=".AppLaunchReceiver" />
     </application>
 
 </manifest>

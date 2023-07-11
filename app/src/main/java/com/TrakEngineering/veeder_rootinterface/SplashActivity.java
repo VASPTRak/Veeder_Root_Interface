@@ -20,6 +20,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 
 import android.util.Log;
@@ -171,7 +172,6 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
                     checkPermissionTask.get();
 
                     if (checkPermissionTask.isValue) {
-
 
                         executeTask();
                     }
@@ -380,17 +380,11 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
 
                         otherServerCall();
 
-
                     } catch (Exception e) {
-
                         e.printStackTrace();
-
                     }
-
-
-
                 } else {
-                    CommonUtils.showNoInternetDialog(SplashActivity.this);
+                    CommonUtils.showNoInternetDialog(SplashActivity.this, true);
                 }
             }
         }, 5000);

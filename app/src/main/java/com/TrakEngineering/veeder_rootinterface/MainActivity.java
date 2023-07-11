@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
                     }
                 } else {
-                    CommonUtils.showNoInternetDialog(MainActivity.this);
+                    CommonUtils.showNoInternetDialog(MainActivity.this, false);
                 }
 
 

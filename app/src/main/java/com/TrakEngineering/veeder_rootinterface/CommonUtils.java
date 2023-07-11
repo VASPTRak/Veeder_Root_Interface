@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.net.ConnectivityManager;
@@ -38,6 +39,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static android.content.Context.WIFI_SERVICE;
 
@@ -197,8 +200,8 @@ class CommonUtils {
     }
 
 
-    public static void showNoInternetDialog(final Activity context) {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+    public static void showNoInternetDialog(final Activity context, boolean fromSplashScreen) {
+        /*AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
         // set title
         alertDialogBuilder.setTitle("No Internet");
         alertDialogBuilder
@@ -215,9 +218,57 @@ class CommonUtils {
         // create alert dialog
         AlertDialog alertDialog = alertDialogBuilder.create();
         // show it
+        alertDialog.show();*/
+
+        final Timer timer = new Timer();
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+        String message = context.getResources().getString(R.string.no_internet);
+        alertDialogBuilder.setMessage(message);
+        alertDialogBuilder.setCancelable(false);
+
+        alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int arg1) {
+
+                        dialog.dismiss();
+
+                        if (timer != null) {
+                            timer.cancel();
+                        }
+                        if (fromSplashScreen) {
+                            RestartApplication(context, message);
+                        } else {
+                            context.finish();
+                        }
+                    }
+                }
+        );
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        if (fromSplashScreen) {
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+
+                    if (alertDialog.isShowing()) {
+                        alertDialog.dismiss();
+                    }
+                    timer.cancel();
+                    RestartApplication(context, message);
+                }
+            }, 5000);
+        }
+
         alertDialog.show();
     }
 
+    public static void RestartApplication(Context context, String message) {
+        LogMessage("CommonUtils", message + ". Restarting the application.");
+        Intent i = new Intent(context, SplashActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        context.startActivity(i);
+    }
 
     public static void setMobileDataEnabled(Context context, boolean enabled) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
 

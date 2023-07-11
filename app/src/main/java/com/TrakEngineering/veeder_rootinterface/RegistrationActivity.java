@@ -365,7 +365,7 @@ public class RegistrationActivity extends AppCompatActivity {
                         } else if (cd.isConnectingToInternet()) {
                             new ReplaceHUBFromApp().execute(hubName, imeiNumber, userName, userPass, userMobile);
                         } else {
-                            CommonUtils.showNoInternetDialog(RegistrationActivity.this);
+                            CommonUtils.showNoInternetDialog(RegistrationActivity.this, false);
                         }
                     }
                 }

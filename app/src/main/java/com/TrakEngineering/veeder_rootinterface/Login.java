@@ -61,7 +61,7 @@ public class Login extends AppCompatActivity {
                     if (cd.isConnectingToInternet())
                         new LoginTask().execute(etUserId.getText().toString().trim(), etPass.getText().toString().trim());
                     else
-                        CommonUtils.showNoInternetDialog(Login.this);
+                        CommonUtils.showNoInternetDialog(Login.this, false);
                 }
             }
         });
