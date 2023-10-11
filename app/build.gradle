@@ -9,9 +9,8 @@ android {
             storePassword 's'
         }
     }
-    //compileSdkVersion 29
-    compileSdkVersion 31
-    buildToolsVersion "30.0.3"
+    compileSdkVersion 29
+
     defaultConfig {
         applicationId "com.TrakEngineering.veeder_rootinterface"
         minSdkVersion 26

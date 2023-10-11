@@ -73,7 +73,7 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
     private static final int PERMISSION_REQUEST_CODE_READ = 3;
     private static final int PERMISSION_REQUEST_CODE_WRITE = 4;
     private static final int CODE_WRITE_SETTINGS_PERMISSION = 5;
-    private static final int CODE_BLUETOOTH_CONNECT = 7;
+    //private static final int CODE_BLUETOOTH_CONNECT = 7;
     private static final int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 8;
     private GoogleApiClient mGoogleApiClient;
     //    WifiApManager wifiApManager;
@@ -361,12 +361,6 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
 
         try {
             String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO, Manifest.permission.BLUETOOTH};
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                permissions = new String[] {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO, Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN};
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                permissions = new String[] {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO, Manifest.permission.BLUETOOTH};
-            }
 
             boolean isGranted = checkPermission(SplashActivity.this, permissions[0]);
 
@@ -712,14 +706,14 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
                 }
                 break;
 
-            case CODE_BLUETOOTH_CONNECT:
+            /*case CODE_BLUETOOTH_CONNECT:
                 if (grantResults.length > 9 && grantResults[9] == PackageManager.PERMISSION_GRANTED) {
                     showMessageDilaog(SplashActivity.this, "Permission Granted", "Please press to ok and Restart the app.");
                     Toast.makeText(SplashActivity.this, "Permission Granted, Now you can access app.", Toast.LENGTH_SHORT).show();
                 } else {
                     CommonUtils.showMessageDilaogFinish(SplashActivity.this, "Bluetooth Connect permission not allowed.", "Please enable 'Bluetooth Connect Permission' for this app to continue.");
                 }
-                break;
+                break;*/
 
             case ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE:
                 if (grantResults.length > 0 && grantResults[5] == PackageManager.PERMISSION_GRANTED) {
