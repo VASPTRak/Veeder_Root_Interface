@@ -9,13 +9,15 @@ android {
             storePassword 's'
         }
     }
-    compileSdkVersion 29
+    //compileSdkVersion 29
+    compileSdkVersion 31
+    buildToolsVersion "30.0.3"
     defaultConfig {
         applicationId "com.TrakEngineering.veeder_rootinterface"
         minSdkVersion 26
         targetSdkVersion 29
         versionCode 8
-        versionName "1.23"
+        versionName "1.24"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }

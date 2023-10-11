@@ -162,8 +162,6 @@ public class VRInitAlarmService extends Service {
         CommonUtils.LogMessage(TAG, "VRInitAlarmService: AlarmAt12Am (Alarm set for " + sdFormat.format(dt) + ")"); // #2238
 
         cal.add(Calendar.MINUTE, -5);
-        //Date dtNew = new Date(cal.getTimeInMillis());
-        //CommonUtils.LogMessage(TAG, "VRInitAlarmService: AlarmAt12Am (App launch alarm set for " + sdFormat.format(dtNew) + ")"); // #2238
         Intent intentAppLaunch1 = new Intent(getApplicationContext(), AppLaunchReceiver.class);
         PendingIntent pIntent1 = PendingIntent.getBroadcast(getApplicationContext(), 11, intentAppLaunch1, FLAG_CANCEL_CURRENT);
         AlarmManager exAlarm_12am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);

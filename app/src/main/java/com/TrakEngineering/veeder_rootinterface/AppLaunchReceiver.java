@@ -2,6 +2,7 @@ package com.TrakEngineering.veeder_rootinterface;
 
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -22,12 +23,18 @@ public class AppLaunchReceiver extends BroadcastReceiver {
             CommonUtils.LogMessage("AppLaunchReceiver", "Is VR App in the foreground: " + isForeground);
             if (!isForeground) {
                 CommonUtils.LogMessage("AppLaunchReceiver", "The VR App is in the background. Launching the VR Interface App..");
-                Intent i = context.getPackageManager().getLaunchIntentForPackage("com.TrakEngineering.veeder_rootinterface");
-                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                context.startActivity(i);
+
+                /*Intent i = new Intent(context.getPackageManager().getLaunchIntentForPackage(context.getPackageName()));
+                i.setComponent(new ComponentName("com.TrakEngineering.veeder_rootinterface","com.TrakEngineering.veeder_rootinterface.SplashActivity"));
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(i);*/
+                Intent activity = new Intent(context, SplashActivity.class);
+                activity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                context.startActivity(activity);
+
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            CommonUtils.LogMessage("AppLaunchReceiver", "AppLaunchReceiver: Exception: " + e.getMessage());
         }
     }
 }
