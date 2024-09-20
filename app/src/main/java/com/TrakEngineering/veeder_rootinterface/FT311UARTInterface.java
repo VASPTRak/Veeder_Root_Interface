@@ -58,30 +58,33 @@ public class FT311UARTInterface extends BackgroundService {
     private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (ACTION_USB_PERMISSION.equals(action)) {
-                synchronized (this) {
-                    UsbAccessory accessory = intent.getParcelableExtra(UsbManager.EXTRA_ACCESSORY);
-                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
-                        Toast.makeText(Constants.global_context, "Allow USB Permission", Toast.LENGTH_SHORT).show();
-                        OpenAccessory(accessory);
-                    } else {
-                        Toast.makeText(Constants.global_context, "Deny USB Permission", Toast.LENGTH_SHORT).show();
-                        Log.d("LED", "permission denied for accessory " + accessory);
+            try {
+                String action = intent.getAction();
+                if (ACTION_USB_PERMISSION.equals(action)) {
+                    synchronized (this) {
+                        UsbAccessory accessory = intent.getParcelableExtra(UsbManager.EXTRA_ACCESSORY);
+                        if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+                            Toast.makeText(Constants.global_context, "Allow USB Permission", Toast.LENGTH_SHORT).show();
+                            OpenAccessory(accessory);
+                        } else {
+                            Toast.makeText(Constants.global_context, "Deny USB Permission", Toast.LENGTH_SHORT).show();
+                            Log.d("LED", "permission denied for accessory " + accessory);
 
+                        }
+                        mPermissionRequestPending = false;
                     }
-                    mPermissionRequestPending = false;
+                } else if (UsbManager.ACTION_USB_ACCESSORY_DETACHED.equals(action)) {
+                    saveDetachPreference();
+                    DestroyAccessory(true);
+                    //CloseAccessory();
+                } else {
+                    Log.d("LED", "....");
                 }
-            } else if (UsbManager.ACTION_USB_ACCESSORY_DETACHED.equals(action)) {
-                saveDetachPreference();
-                DestroyAccessory(true);
-                //CloseAccessory();
-            } else {
-                Log.d("LED", "....");
+            } catch (Exception ex) {
+                CommonUtils.LogMessage(TAG, "FT311UARTInterface: mUsbReceiver onReceive Exception: ", ex);
             }
         }
     };
-
 
     /*constructor*/
     public FT311UARTInterface(Context context, SharedPreferences sharePrefSettings) {
@@ -92,7 +95,6 @@ public class FT311UARTInterface extends BackgroundService {
         writeusbdata = new byte[256];
         /*128(make it 256, but looks like bytes should be enough)*/
         readBuffer = new byte[maxnumbytes];
-
 
         readIndex = 0;
         writeIndex = 0;
@@ -111,93 +113,101 @@ public class FT311UARTInterface extends BackgroundService {
 
         localcontext = context;
         Looper.prepare();
-
     }
 
-    public void SetConfig(int baud, byte dataBits, byte stopBits,
-                          byte parity, byte flowControl) {
+    public void SetConfig(int baud, byte dataBits, byte stopBits, byte parity, byte flowControl) {
+        try {
+            /*prepare the baud rate buffer*/
+            writeusbdata[0] = (byte) baud;
+            writeusbdata[1] = (byte) (baud >> 8);
+            writeusbdata[2] = (byte) (baud >> 16);
+            writeusbdata[3] = (byte) (baud >> 24);
 
-        /*prepare the baud rate buffer*/
-        writeusbdata[0] = (byte) baud;
-        writeusbdata[1] = (byte) (baud >> 8);
-        writeusbdata[2] = (byte) (baud >> 16);
-        writeusbdata[3] = (byte) (baud >> 24);
+            /*data bits*/
+            writeusbdata[4] = dataBits;
+            /*stop bits*/
+            writeusbdata[5] = stopBits;
+            /*parity*/
+            writeusbdata[6] = parity;
+            /*flow control*/
+            writeusbdata[7] = flowControl;
 
-        /*data bits*/
-        writeusbdata[4] = dataBits;
-        /*stop bits*/
-        writeusbdata[5] = stopBits;
-        /*parity*/
-        writeusbdata[6] = parity;
-        /*flow control*/
-        writeusbdata[7] = flowControl;
-
-        /*send the UART configuration packet*/
-        SendPacket(8);
+            /*send the UART configuration packet*/
+            SendPacket(8);
+        } catch (Exception ex) {
+            CommonUtils.LogMessage(TAG, "FT311UARTInterface: SetConfig Exception: ", ex);
+        }
     }
 
     /*write data*/
     public byte SendData(int numBytes, byte[] buffer) {
-        status = 0x00; /*success by default*/
-        /*
-         * if num bytes are more than maximum limit
-         */
-        if (numBytes < 1) {
-            /*return the status with the error in the command*/
-            return status;
+        try {
+            status = 0x00; /*success by default*/
+            /*
+             * if num bytes are more than maximum limit
+             */
+            if (numBytes < 1) {
+                /*return the status with the error in the command*/
+                return status;
+            }
+
+            /*check for maximum limit*/
+            if (numBytes > 256) {
+                numBytes = 256;
+            }
+
+            /*prepare the packet to be sent*/
+            // CommonUtils.LogMessage(TAG, "write"+String.format("%02x",buffer[count]));
+            System.arraycopy(buffer, 0, writeusbdata, 0, numBytes);
+
+            if (numBytes != 64) {
+                SendPacket(numBytes);
+            } else {
+                byte temp = writeusbdata[63];
+                SendPacket(63);
+                writeusbdata[0] = temp;
+                SendPacket(1);
+            }
+        } catch (Exception ex) {
+            CommonUtils.LogMessage(TAG, "FT311UARTInterface: SendData Exception: ", ex);
         }
-
-        /*check for maximum limit*/
-        if (numBytes > 256) {
-            numBytes = 256;
-        }
-
-        /*prepare the packet to be sent*/
-        // CommonUtils.LogMessage(TAG, "write"+String.format("%02x",buffer[count]));
-        System.arraycopy(buffer, 0, writeusbdata, 0, numBytes);
-
-        if (numBytes != 64) {
-            SendPacket(numBytes);
-        } else {
-            byte temp = writeusbdata[63];
-            SendPacket(63);
-            writeusbdata[0] = temp;
-            SendPacket(1);
-        }
-
         return status;
     }
 
     /*read data*/
     public byte ReadData(int numBytes, byte[] buffer, int[] actualNumBytes) {
-        status = 0x00; /*success by default*/
+        try {
+            status = 0x00; /*success by default*/
 
-        /*should be at least one byte to read*/
-        if ((numBytes < 1) || (totalBytes == 0)) {
-            actualNumBytes[0] = 0;
-            status = 0x01;
-            return status;
-        }
+            /*should be at least one byte to read*/
+            if ((numBytes < 1) || (totalBytes == 0)) {
+                actualNumBytes[0] = 0;
+                status = 0x01;
+                return status;
+            }
 
-        /*check for max limit*/
-        if (numBytes > totalBytes)
-            numBytes = totalBytes;
+            /*check for max limit*/
+            if (numBytes > totalBytes)
+                numBytes = totalBytes;
 
-        /*update the number of bytes available*/
-        totalBytes -= numBytes;
+            /*update the number of bytes available*/
+            totalBytes -= numBytes;
 
-        actualNumBytes[0] = numBytes;
+            actualNumBytes[0] = numBytes;
 
-        /*copy to the user buffer*/
-        for (int count = 0; count < numBytes; count++) {
-            buffer[count] = readBuffer[readIndex];
-            //Log.w("UART", String.format("%02x",buffer[count]));
-            //CommonUtils.LogMessage(TAG, "read"+String.format("%02x",buffer[count]));
-            readIndex++;
-            /*shouldnt read more than what is there in the buffer,
-             * 	so no need to check the overflow
-             */
-            readIndex %= maxnumbytes;
+            /*copy to the user buffer*/
+            for (int count = 0; count < numBytes; count++) {
+                buffer[count] = readBuffer[readIndex];
+                //Log.w("UART", String.format("%02x",buffer[count]));
+                //CommonUtils.LogMessage(TAG, "read"+String.format("%02x",buffer[count]));
+                readIndex++;
+                /*shouldnt read more than what is there in the buffer,
+                 * 	so no need to check the overflow
+                 */
+                readIndex %= maxnumbytes;
+            }
+        } catch (Exception ex) {
+            CommonUtils.LogMessage(TAG, "FT311UARTInterface: ReadData Exception: ", ex);
         }
         return status;
     }
@@ -210,7 +220,7 @@ public class FT311UARTInterface extends BackgroundService {
                 return 1;
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            CommonUtils.LogMessage(TAG, "FT311UARTInterface: SendPacket Exception: ", e);
             return -1;
         }
         return 0;
@@ -218,180 +228,201 @@ public class FT311UARTInterface extends BackgroundService {
 
     /*resume accessory*/
     public int ResumeAccessory() {
-        // Intent intent = getIntent();
-        if (inputstream != null && outputstream != null) {
-            return 1;
-        }
+        try {
+            // Intent intent = getIntent();
+            if (inputstream != null && outputstream != null) {
+                return 1;
+            }
 
-        UsbAccessory[] accessories = usbmanager.getAccessoryList();
+            UsbAccessory[] accessories = usbmanager.getAccessoryList();
 
-        if (accessories != null) {
+            if (accessories != null) {
 //			Looper.prepare();
-            Toast.makeText(Constants.global_context, "Accessory Attached", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Constants.global_context, "Accessory Attached", Toast.LENGTH_SHORT).show();
 //			Looper.loop();
-        } else {
-            // return 2 for accessory detached case
-            //Log.e(">>@@","ResumeAccessory RETURN 2 (accessories == null)");
-            accessory_attached = false;
-            return 2;
-        }
-
-        UsbAccessory accessory = (accessories == null ? null : accessories[0]);
-        if (accessory != null) {
-            if (!accessory.toString().contains(ManufacturerString)) {
-//				Looper.prepare();
-                Toast.makeText(Constants.global_context, "Manufacturer is not matched!", Toast.LENGTH_SHORT).show();
-//				Looper.loop();
-                return 1;
-            }
-
-            if (!accessory.toString().contains(ModelString1) && !accessory.toString().contains(ModelString2)) {
-//				Looper.prepare();
-                Toast.makeText(Constants.global_context, "Model is not matched!", Toast.LENGTH_SHORT).show();
-//				Looper.loop();
-                return 1;
-            }
-
-            if (!accessory.toString().contains(VersionString)) {
-//				Looper.prepare();
-                Toast.makeText(Constants.global_context, "Version is not matched!", Toast.LENGTH_SHORT).show();
-//				Looper.loop();
-                return 1;
-            }
-
-//			Looper.prepare();
-            Toast.makeText(Constants.global_context, "Manufacturer, Model & Version are matched!", Toast.LENGTH_SHORT).show();
-//			Looper.loop();
-            accessory_attached = true;
-
-            if (usbmanager.hasPermission(accessory)) {
-                OpenAccessory(accessory);
             } else {
-                synchronized (mUsbReceiver) {
-                    if (!mPermissionRequestPending) {
+                // return 2 for accessory detached case
+                //Log.e(">>@@","ResumeAccessory RETURN 2 (accessories == null)");
+                accessory_attached = false;
+                return 2;
+            }
+
+            UsbAccessory accessory = (accessories == null ? null : accessories[0]);
+            if (accessory != null) {
+                if (!accessory.toString().contains(ManufacturerString)) {
+//				Looper.prepare();
+                    Toast.makeText(Constants.global_context, "Manufacturer is not matched!", Toast.LENGTH_SHORT).show();
+//				Looper.loop();
+                    return 1;
+                }
+
+                if (!accessory.toString().contains(ModelString1) && !accessory.toString().contains(ModelString2)) {
+//				Looper.prepare();
+                    Toast.makeText(Constants.global_context, "Model is not matched!", Toast.LENGTH_SHORT).show();
+//				Looper.loop();
+                    return 1;
+                }
+
+                if (!accessory.toString().contains(VersionString)) {
+//				Looper.prepare();
+                    Toast.makeText(Constants.global_context, "Version is not matched!", Toast.LENGTH_SHORT).show();
+//				Looper.loop();
+                    return 1;
+                }
+
+//			Looper.prepare();
+                Toast.makeText(Constants.global_context, "Manufacturer, Model & Version are matched!", Toast.LENGTH_SHORT).show();
+//			Looper.loop();
+                accessory_attached = true;
+
+                if (usbmanager.hasPermission(accessory)) {
+                    OpenAccessory(accessory);
+                } else {
+                    synchronized (mUsbReceiver) {
+                        if (!mPermissionRequestPending) {
 //						Looper.prepare();
-                        Toast.makeText(Constants.global_context, "Request USB Permission", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(Constants.global_context, "Request USB Permission", Toast.LENGTH_SHORT).show();
 //						Looper.loop();
-                        usbmanager.requestPermission(accessory,
-                                mPermissionIntent);
-                        mPermissionRequestPending = true;
+                            usbmanager.requestPermission(accessory,
+                                    mPermissionIntent);
+                            mPermissionRequestPending = true;
+                        }
                     }
                 }
+            } else {
+                CommonUtils.LogMessage(TAG, "No UART2 permission");
             }
-        } else {
-            CommonUtils.LogMessage(TAG, "No UART2 permission");
+        } catch (Exception ex) {
+            CommonUtils.LogMessage(TAG, "FT311UARTInterface: ResumeAccessory Exception: ", ex);
         }
-
         return 0;
     }
 
     /*destroy accessory*/
     public void DestroyAccessory(boolean bConfiged) {
+        try {
+            if (bConfiged) {
+                READ_ENABLE = false;  // set false condition for handler_thread to exit waiting data loop
+                writeusbdata[0] = 0;  // send dummy data for instream.read going
+                SendPacket(1);
+            } else {
+                SetConfig(Integer.parseInt(AppConstants.BaudRate), (byte) 1, (byte) 8, (byte) 0, (byte) 0);  // send default setting data for config
+                try {
+                    Thread.sleep(10);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-        if (bConfiged) {
-            READ_ENABLE = false;  // set false condition for handler_thread to exit waiting data loop
-            writeusbdata[0] = 0;  // send dummy data for instream.read going
-            SendPacket(1);
-        } else {
-            SetConfig(Integer.parseInt(AppConstants.BaudRate), (byte) 1, (byte) 8, (byte) 0, (byte) 0);  // send default setting data for config
+                READ_ENABLE = false;  // set false condition for handler_thread to exit waiting data loop
+                writeusbdata[0] = 0;  // send dummy data for instream.read going
+                SendPacket(1);
+                if (accessory_attached) {
+                    saveDefaultPreference();
+                }
+            }
+
             try {
                 Thread.sleep(10);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-            READ_ENABLE = false;  // set false condition for handler_thread to exit waiting data loop
-            writeusbdata[0] = 0;  // send dummy data for instream.read going
-            SendPacket(1);
-            if (accessory_attached) {
-                saveDefaultPreference();
-            }
+            CloseAccessory();
+        } catch (Exception ex) {
+            CommonUtils.LogMessage(TAG, "FT311UARTInterface: DestroyAccessory Exception: ", ex);
         }
-
-        try {
-            Thread.sleep(10);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        CloseAccessory();
     }
 
     /*********************helper routines*************************************************/
-
     public void OpenAccessory(UsbAccessory accessory) {
-        filedescriptor = usbmanager.openAccessory(accessory);
-        if (filedescriptor != null) {
-            usbaccessory = accessory;
+        try {
+            filedescriptor = usbmanager.openAccessory(accessory);
+            if (filedescriptor != null) {
+                usbaccessory = accessory;
 
-            FileDescriptor fd = filedescriptor.getFileDescriptor();
+                FileDescriptor fd = filedescriptor.getFileDescriptor();
 
-            inputstream = new FileInputStream(fd);
-            outputstream = new FileOutputStream(fd);
-            /*check if any of them are null*/
-            if (inputstream == null || outputstream == null) {
-                return;
+                inputstream = new FileInputStream(fd);
+                outputstream = new FileOutputStream(fd);
+                /*check if any of them are null*/
+                if (inputstream == null || outputstream == null) {
+                    return;
+                }
+
+                if (!READ_ENABLE) {
+                    READ_ENABLE = true;
+                    readThread = new read_thread(inputstream);
+                    CommonUtils.LogMessage(TAG, "Connected to UART1");
+                    readThread.start();
+                }
+                CommonUtils.LogMessage(TAG, "FT311UARTInterface: Connected to UART2");
+            } else {
+                CommonUtils.LogMessage(TAG, "FT311UARTInterface: Could not connect to UART");
             }
-
-            if (!READ_ENABLE) {
-                READ_ENABLE = true;
-                readThread = new read_thread(inputstream);
-                CommonUtils.LogMessage(TAG, "Connected to UART1");
-                readThread.start();
-            }
-            CommonUtils.LogMessage(TAG, "Connected to UART2");
-        } else {
-            CommonUtils.LogMessage(TAG, "Could not connect to UART");
+        } catch (Exception ex) {
+            CommonUtils.LogMessage(TAG, "FT311UARTInterface: OpenAccessory Exception: ", ex);
         }
     }
 
     private void CloseAccessory() {
         try {
-            if (filedescriptor != null)
-                filedescriptor.close();
+            try {
+                if (filedescriptor != null)
+                    filedescriptor.close();
 
-        } catch (IOException e) {
-            e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                if (inputstream != null)
+                    inputstream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                if (outputstream != null)
+                    outputstream.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            /*FIXME, add the notfication also to close the application*/
+
+            filedescriptor = null;
+            inputstream = null;
+            outputstream = null;
+
+            localcontext.unregisterReceiver(mUsbReceiver);
+        } catch (Exception ex) {
+            CommonUtils.LogMessage(TAG, "FT311UARTInterface: CloseAccessory Exception: ", ex);
         }
-
-        try {
-            if (inputstream != null)
-                inputstream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            if (outputstream != null)
-                outputstream.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        /*FIXME, add the notfication also to close the application*/
-
-        filedescriptor = null;
-        inputstream = null;
-        outputstream = null;
-
-        localcontext.unregisterReceiver(mUsbReceiver);
     }
 
     protected void saveDetachPreference() {
-        if (intsharePrefSettings != null) {
-            intsharePrefSettings.edit()
-                    .putString("configed", "FALSE")
-                    .commit();
+        try {
+            if (intsharePrefSettings != null) {
+                intsharePrefSettings.edit()
+                        .putString("configed", "FALSE")
+                        .commit();
+            }
+        } catch (Exception ex) {
+            CommonUtils.LogMessage(TAG, "FT311UARTInterface: saveDetachPreference Exception: ", ex);
         }
     }
 
     protected void saveDefaultPreference() {
-        if (intsharePrefSettings != null) {
-            intsharePrefSettings.edit().putString("configed", "TRUE").commit();
-            intsharePrefSettings.edit().putInt("baudRate", Integer.parseInt(AppConstants.BaudRate)).commit();
-            intsharePrefSettings.edit().putInt("stopBit", 1).commit();
-            intsharePrefSettings.edit().putInt("dataBit", 8).commit();
-            intsharePrefSettings.edit().putInt("parity", 0).commit();
-            intsharePrefSettings.edit().putInt("flowControl", 0).commit();
+        try {
+            if (intsharePrefSettings != null) {
+                intsharePrefSettings.edit().putString("configed", "TRUE").commit();
+                intsharePrefSettings.edit().putInt("baudRate", Integer.parseInt(AppConstants.BaudRate)).commit();
+                intsharePrefSettings.edit().putInt("stopBit", 1).commit();
+                intsharePrefSettings.edit().putInt("dataBit", 8).commit();
+                intsharePrefSettings.edit().putInt("parity", 0).commit();
+                intsharePrefSettings.edit().putInt("flowControl", 0).commit();
+            }
+        } catch (Exception ex) {
+            CommonUtils.LogMessage(TAG, "FT311UARTInterface: saveDefaultPreference Exception: ", ex);
         }
     }
 
@@ -443,8 +474,8 @@ public class FT311UARTInterface extends BackgroundService {
 //					    		Log.e(">>@@","totalBytes:"+totalBytes);
                         }
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (Exception ex) {
+                    CommonUtils.LogMessage(TAG, "FT311UARTInterface: read_thread inner Exception: ", ex);
                 }
             }
         }

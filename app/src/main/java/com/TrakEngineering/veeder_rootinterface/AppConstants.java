@@ -269,23 +269,28 @@ public class AppConstants {
 
 
     public static void colorToast(Context ctx, String msg, int colr) {
-        Toast toast = Toast.makeText(ctx, " " + msg + " ", Toast.LENGTH_LONG);
-        toast.getView().setBackgroundColor(colr);
-        toast.setGravity(Gravity.CENTER, 0, 0);
-        toast.show();
-
+        try {
+            Toast toast = Toast.makeText(ctx, " " + msg + " ", Toast.LENGTH_LONG);
+            toast.getView().setBackgroundColor(colr);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+        } catch (Exception ex) {
+            CommonUtils.LogMessage("AppConstants", "colorToast Exception: ", ex);
+        }
     }
 
-
     public static void colorToastBigFont(Context ctx, String msg, int colr) {
-        Toast toast = Toast.makeText(ctx, " " + msg + " ", Toast.LENGTH_LONG);
-        toast.getView().setBackgroundColor(colr);
-        toast.setGravity(Gravity.CENTER, 0, 0);
-        ViewGroup group = (ViewGroup) toast.getView();
-        TextView messageTextView = (TextView) group.getChildAt(0);
-        messageTextView.setTextSize(25);
-        toast.show();
-
+        try {
+            Toast toast = Toast.makeText(ctx, " " + msg + " ", Toast.LENGTH_LONG);
+            toast.getView().setBackgroundColor(colr);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            ViewGroup group = (ViewGroup) toast.getView();
+            TextView messageTextView = (TextView) group.getChildAt(0);
+            messageTextView.setTextSize(25);
+            toast.show();
+        } catch (Exception ex) {
+            CommonUtils.LogMessage("AppConstants", "colorToastBigFont Exception: ", ex);
+        }
     }
 
     public static void notificationAlert(Context context) {

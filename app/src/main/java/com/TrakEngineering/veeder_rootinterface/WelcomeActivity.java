@@ -335,7 +335,7 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
 
         // set User Information
         UserInfoEntity userInfoEntity = CommonUtils.getCustomerDetails(WelcomeActivity.this);
-        if (userInfoEntity.FluidSecureSiteName != "") {
+        if (!userInfoEntity.FluidSecureSiteName.isEmpty()) {
             AppConstants.Title = "HUB Name : " + userInfoEntity.FluidSecureSiteName;
         } else {
             AppConstants.Title = "HUB Name : " + userInfoEntity.PersonName;//+ "\nMobile : " + userInfoEntity.PhoneNumber + "\nEmail : " + userInfoEntity.PersonEmail
@@ -2389,12 +2389,9 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
             Long wait_time = (target_time.getTimeInMillis() - cal.getTimeInMillis());
             Constants.alarm.setRepeating(AlarmManager.RTC_WAKEUP, wait_time + currentTimeMillis(), (long) (24.0 / VR_polling_interval) * 60 * 60 * 1000, pintent);  //by defualt, 6 hours
 
-
         } catch (Exception e) {
             CommonUtils.LogMessage(TAG, "Do_next_BT_Service:  Exception=" + e.getMessage(), null);
-
         }
-
     }
 
     public void CheckIfDevicesIsPaired(String MacAddressForBTVeederRoot) {
@@ -2561,8 +2558,7 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
 
     }
 
-    private void RemoveAllPreviousSetAlarms() {
-
+    /*private void RemoveAllPreviousSetAlarms() {
         try {
             //Remove previous alarms so we don't have multiple firing.
             Intent intent = new Intent(this, ExactAlarmReceiver.class);
@@ -2575,13 +2571,11 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
             Constants.exat_alarm_6pm.cancel(pendingIntent);
             Constants.exat_alarm_4am.cancel(pendingIntent);
             Constants.exat_alarm_4pm.cancel(pendingIntent);
-
         } catch (Exception e) {
             e.printStackTrace();
             CommonUtils.LogMessage(TAG, "RemoveAllPreviousSetAlarms Ex: " + e.toString());
         }
-
-    }
+    }*/
 
     public class ExactAlarmReceiver extends BroadcastReceiver {
 
@@ -2803,27 +2797,16 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
             String[] nLine = response.split("\n");
             String VR_DTime = "";
 
+            //================ Date-Time ==================
             int num = 0;
             for (int i = 0; i < nLine.length; i++) {
                 String line = nLine[i].trim();
 
-                if (line.contains("TANK")) { // first instance of TANK word
+                if (line.contains("I20200")) {
                     num = i;
                     try {
-                        VR_DTime = nLine[i - 12];
+                        VR_DTime = nLine[i + 1]; // Send as it is to the server
 
-                        String[] vals = VR_DTime.split(" "); // To remove extra space between date and time
-                        ArrayList<String> dateList = new ArrayList<>();
-
-                        for (String data : vals) {
-                            if (!data.isEmpty()) {
-                                dateList.add(data);
-                            }
-                        }
-
-                        if (dateList.size() > 2) {
-                            VR_DTime = dateList.get(0) + " " + dateList.get(1) + " " + dateList.get(2);
-                        }
                         if (VR_DTime.contains("\r")) {
                             VR_DTime = AppConstants.currentDate("yyyy-MM-dd HH:mm:ss");
                         }
@@ -2833,12 +2816,13 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
                     break;
                 }
             }
+            //==============================================
 
             StringBuilder sbMainData = new StringBuilder();
             for (int i = num; i < nLine.length; i++) { // To get only main data (i.e. Tank, Product, Start-End Readings)
                 String line = nLine[i].trim();
 
-                if (line.contains("TANK") || line.contains("START") || line.contains("END")) {
+                if (line.contains("TANK") || line.contains("START") || line.contains("END")) { // || (nLine[i + 1].trim().contains("INCREASE")) || line.contains("AMOUNT") // Test before release
                     sbMainData.append(line).append("\n");
                 }
             }
