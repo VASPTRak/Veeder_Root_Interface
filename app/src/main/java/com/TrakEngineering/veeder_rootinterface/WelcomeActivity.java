@@ -147,6 +147,7 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
     private EditText edt_mac_address;
     private EditText edt_vr_command;
     private LinearLayout linearMac;
+    private LinearLayout manual_VR_readings;
     public ExactAlarmReceiver exact_alarm_rec = null;
     public String current_Command = "";
 
@@ -215,6 +216,7 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
         btn_connect = (Button) findViewById(R.id.btn_connect);
         btn_disConnect = (Button) findViewById(R.id.btn_disConnect);
         edt_mac_address = (EditText) findViewById(R.id.edt_mac_address);
+        manual_VR_readings = findViewById(R.id.manual_VR_readings);
 
         InItGUI();
 
@@ -299,6 +301,7 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
         } else {
             linearMac.setVisibility(View.GONE);
             btn_disConnect.setVisibility(View.GONE);
+            manual_VR_readings.setVisibility(View.GONE);
 
             //====================== USB Permission ================================//
             try {
@@ -392,7 +395,6 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
             @Override
             public void onClick(View v) {
                 GetVRReadingsManually();
-
             }
         });
 
@@ -2548,7 +2550,6 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
             e.printStackTrace();
         }
     }
-
 
     private void GetVRReadingsExactAlarm() {
 
