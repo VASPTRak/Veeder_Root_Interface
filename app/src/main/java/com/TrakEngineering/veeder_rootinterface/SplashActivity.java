@@ -82,7 +82,7 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
     private double latitude;
     private double longitude;
 
-    private static void showMessageDilaog(final Activity context, String title, String message) {
+    private static void showMessageDialog(final Activity context, String title, String message) {
 
         android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(context);
         // set title
@@ -119,7 +119,6 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
 
         mGoogleApiClient.connect();
 
-//        wifiApManager = new WifiApManager(this);
         boolean permission;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             permission = Settings.System.canWrite(SplashActivity.this);
@@ -151,52 +150,22 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
         if (!AppConstants.isMobileDataAvailable(SplashActivity.this)) {
             AppConstants.AlertDialogFinish(SplashActivity.this, "Please check your Mobile Data is On");
 
-        }/*else if (!CommonUtils.isHotspotEnabled(SplashActivity.this)) {
-           // AppConstants.AlertDialogFinish(SplashActivity.this, "Please enable hotspot of your device");
+        } else {
+            try {
+                checkPermissionTask checkPermissionTask = new checkPermissionTask();
+                checkPermissionTask.execute();
+                checkPermissionTask.get();
 
-        }*/
-        else {
-
-           /* if (CommonUtils.isWiFiEnabled(SplashActivity.this)) {
-                System.out.println("WiFiWiFiEnabled.....");
-                AppConstants.IS_WIFI_ON = true;
-            } else {
-                System.out.println("WiFiOffff.....");
-                AppConstants.IS_WIFI_ON = false;
-            }*/
-
-//            wifiApManager.setWifiApEnabled(null, true);
-
-            LocationManager locationManager = (LocationManager) SplashActivity.this.getSystemService(Context.LOCATION_SERVICE);
-            boolean statusOfGPS = locationManager != null && locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-
-
-            if (!statusOfGPS) {
-
-                turnGPSOn();
-
-            }
-            {
-
-                try {
-                    checkPermissionTask checkPermissionTask = new checkPermissionTask();
-                    checkPermissionTask.execute();
-                    checkPermissionTask.get();
-
-                    if (checkPermissionTask.isValue) {
-
-                        executeTask();
-                    }
-                } catch (Exception ex) {
-                    Log.e(TAG, ex.getMessage());
+                if (checkPermissionTask.isValue) {
+                    executeTask();
                 }
+            } catch (Exception ex) {
+                Log.e(TAG, ex.getMessage());
             }
         }
     }
 
-    private void turnGPSOn() {/*
-
-
+    /*private void turnGPSOn() {*//*
         LocationRequest mLocationRequest = new LocationRequest();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
@@ -208,9 +177,7 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
                 .addLocationRequest(mLocationRequest)
                 .addLocationRequest(mLocationRequest1);
 
-
         LocationSettingsRequest mLocationSettingsRequest = builder.build();
-
 
         PendingResult<LocationSettingsResult> result =
                 LocationServices.SettingsApi.checkLocationSettings(
@@ -247,12 +214,10 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
                 }
             }
         });
-
-
         //Intent in = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
         //startActivity(in);
-*/
-    }
+*//*
+    }*/
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -360,22 +325,26 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
         boolean isValue = false;
 
         try {
-            String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO, Manifest.permission.BLUETOOTH};
+            String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.BLUETOOTH};
 
             boolean isGranted = checkPermission(SplashActivity.this, permissions[0]);
 
+            for (String permission : permissions) {
+                isGranted = checkPermission(SplashActivity.this, permission);
+                if (!isGranted) {
+                    break;
+                }
+            }
+
             if (!isGranted) {
-                ActivityCompat.requestPermissions(SplashActivity.this, permissions, PERMISSION_REQUEST_CODE_CORSE_LOCATION);
+                ActivityCompat.requestPermissions(SplashActivity.this, permissions, PERMISSION_REQUEST_CODE_WRITE);
                 isValue = false;
             } else {
                 isValue = true;
             }
-
-
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
         return isValue;
     }
 
@@ -386,11 +355,8 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
 
                 ConnectionDetector cd = new ConnectionDetector(SplashActivity.this);
                 if (cd.isConnectingToInternet()) {
-
                     try {
-
                         otherServerCall();
-
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -399,7 +365,6 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
                 }
             }
         }, 5000);
-
     }
 
     public void otherServerCall() {
@@ -602,13 +567,9 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
                         } else {
                             CommonUtils.showMessageDilaog(SplashActivity.this, "Error Message", "You are not Approved yet!");
                         }
-
-
                     } catch (Exception ex) {
                         CommonUtils.LogMessage(TAG, "Handle user Data", ex);
                     }
-
-
                 } else if (ResponceMessage.equalsIgnoreCase("fail")) {
 
                     String ResponceText = jsonObj.getString(AppConstants.RES_TEXT);
@@ -618,29 +579,18 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
                         startActivity(new Intent(SplashActivity.this, RegistrationActivity.class));
                         finish();
 
-
                     } else if (ResponceText.equalsIgnoreCase("notapproved")) {
 
                         AlertDialogBox(SplashActivity.this, "Your Registration request is not approved yet.\nIt is marked Inactive in the Company Software.\nPlease contact your companyâ€™s administrator.");
-                    } else if (ResponceText.equalsIgnoreCase("IMEI not exists")) {
-
-
-                        CommonUtils.showMessageDilaog(SplashActivity.this, "Error Message", ResponceText);
-
-                    } else if (ResponceText.equalsIgnoreCase("No data found")) {
-                        CommonUtils.showMessageDilaog(SplashActivity.this, "Error Message", ResponceText);
-
                     } else {
                         CommonUtils.showMessageDilaog(SplashActivity.this, "Error Message", ResponceText);
                     }
-
                 } else {
                     CommonUtils.showMessageDilaog(SplashActivity.this, "Fuel Secure", "No Internet");
                 }
             } else {
                 AppConstants.AlertDialogFinish(SplashActivity.this, "Server response is empty. Please try again later.");
             }
-
         } catch (Exception e) {
             CommonUtils.LogMessage(TAG, " CheckApproved Exception ", e);
         }
@@ -672,7 +622,7 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
 
             case PERMISSION_REQUEST_CODE_CORSE_LOCATION:
                 if (grantResults.length > 0 && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                    showMessageDilaog(SplashActivity.this, "Permission Granted", "Please press to ok for restart the app.");
+                    showMessageDialog(SplashActivity.this, "Permission Granted", "Please press to ok for restart the app.");
                     Toast.makeText(SplashActivity.this, "Permission Granted, Now you can access app", Toast.LENGTH_SHORT).show();
                 } else {
                     CommonUtils.showMessageDilaogFinish(SplashActivity.this, "No GPS Permission", "Please enable gps and Allow the gps permission for this app to continue.");
@@ -681,7 +631,7 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
 
             case PERMISSION_REQUEST_CODE_READ_phone:
                 if (grantResults.length > 0 && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
-                    showMessageDilaog(SplashActivity.this, "Permission Granted", "Please press to ok for restart the app.");
+                    showMessageDialog(SplashActivity.this, "Permission Granted", "Please press to ok for restart the app.");
                     Toast.makeText(SplashActivity.this, "Permission Granted, Now you can access app.", Toast.LENGTH_SHORT).show();
                 } else {
                     CommonUtils.showMessageDilaogFinish(SplashActivity.this, "No Phone State Permission", "Please enable read phone permission for this app to continue.");
@@ -690,7 +640,7 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
 
             case PERMISSION_REQUEST_CODE_READ:
                 if (grantResults.length > 0 && grantResults[3] == PackageManager.PERMISSION_GRANTED) {
-                    showMessageDilaog(SplashActivity.this, "Permission Granted", "Please press to ok for restart the app.");
+                    showMessageDialog(SplashActivity.this, "Permission Granted", "Please press to ok for restart the app.");
                     Toast.makeText(SplashActivity.this, "Permission Granted, Now you can access app", Toast.LENGTH_SHORT).show();
                 } else {
                     CommonUtils.showMessageDilaogFinish(SplashActivity.this, "No read state for Storage.", "Please enable 'Read Storage Permission' for this app to continue.");
@@ -699,7 +649,7 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
 
             case PERMISSION_REQUEST_CODE_WRITE:
                 if (grantResults.length > 0 && grantResults[4] == PackageManager.PERMISSION_GRANTED) {
-                    showMessageDilaog(SplashActivity.this, "Permission Granted", "Please press to ok and Restart the app.");
+                    showMessageDialog(SplashActivity.this, "Permission Granted", "Please press to ok and Restart the app.");
                     Toast.makeText(SplashActivity.this, "Permission Granted, Now you can access app.", Toast.LENGTH_SHORT).show();
                 } else {
                     CommonUtils.showMessageDilaogFinish(SplashActivity.this, "No write state for Storage.", "Please enable 'Write Storage Permission' for this app to continue.");
@@ -717,7 +667,7 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
 
             case ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE:
                 if (grantResults.length > 0 && grantResults[5] == PackageManager.PERMISSION_GRANTED) {
-                    showMessageDilaog(SplashActivity.this, "Permission Granted", "Please press to ok for restart the app.");
+                    showMessageDialog(SplashActivity.this, "Permission Granted", "Please press to ok for restart the app.");
                     Toast.makeText(SplashActivity.this, "Permission Granted, Now you can access app", Toast.LENGTH_SHORT).show();
                 } else {
                     CommonUtils.showMessageDilaogFinish(SplashActivity.this, "No Overlay Permission", "OVERLAY");
@@ -726,29 +676,23 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
         }
     }
 
-    @TargetApi(21)
+    /*@TargetApi(21)
     public void setGlobalMobileDatConnection() {
-
         NetworkRequest.Builder requestbuilder = new NetworkRequest.Builder();
         requestbuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
 
         connection_manager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 
-
         connection_manager.requestNetwork(requestbuilder.build(), new ConnectivityManager.NetworkCallback() {
             @Override
             public void onAvailable(Network network) {
-
-
                 System.out.println(" network......." + network);
-
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     connection_manager.bindProcessToNetwork(network);
-
                 }
             }
         });
-    }
+    }*/
 
     public class checkPermissionTask extends AsyncTask<Void, Void, Void> {
         boolean isValue = false;

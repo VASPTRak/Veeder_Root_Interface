@@ -13,10 +13,10 @@ android {
 
     defaultConfig {
         applicationId "com.TrakEngineering.veeder_rootinterface"
-        minSdkVersion 26
+        minSdkVersion 25
         targetSdkVersion 28
         versionCode 8
-        versionName "1.25"
+        versionName "1.26"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }

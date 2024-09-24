@@ -253,6 +253,7 @@ public class FT311UARTInterface extends BackgroundService {
 //				Looper.prepare();
                     Toast.makeText(Constants.global_context, "Manufacturer is not matched!", Toast.LENGTH_SHORT).show();
 //				Looper.loop();
+                    CommonUtils.LogMessage(TAG, "FT311UARTInterface: Manufacturer is not matched!");
                     return 1;
                 }
 
@@ -260,6 +261,7 @@ public class FT311UARTInterface extends BackgroundService {
 //				Looper.prepare();
                     Toast.makeText(Constants.global_context, "Model is not matched!", Toast.LENGTH_SHORT).show();
 //				Looper.loop();
+                    CommonUtils.LogMessage(TAG, "FT311UARTInterface: Model is not matched!");
                     return 1;
                 }
 
@@ -267,11 +269,13 @@ public class FT311UARTInterface extends BackgroundService {
 //				Looper.prepare();
                     Toast.makeText(Constants.global_context, "Version is not matched!", Toast.LENGTH_SHORT).show();
 //				Looper.loop();
+                    CommonUtils.LogMessage(TAG, "FT311UARTInterface: Version is not matched!");
                     return 1;
                 }
 
 //			Looper.prepare();
                 Toast.makeText(Constants.global_context, "Manufacturer, Model & Version are matched!", Toast.LENGTH_SHORT).show();
+                CommonUtils.LogMessage(TAG, "FT311UARTInterface: Manufacturer, Model & Version are matched!");
 //			Looper.loop();
                 accessory_attached = true;
 
@@ -283,6 +287,7 @@ public class FT311UARTInterface extends BackgroundService {
 //						Looper.prepare();
                             Toast.makeText(Constants.global_context, "Request USB Permission", Toast.LENGTH_SHORT).show();
 //						Looper.loop();
+                            CommonUtils.LogMessage(TAG, "FT311UARTInterface: Requesting USB_PERMISSION.");
                             usbmanager.requestPermission(accessory,
                                     mPermissionIntent);
                             mPermissionRequestPending = true;
@@ -290,7 +295,7 @@ public class FT311UARTInterface extends BackgroundService {
                     }
                 }
             } else {
-                CommonUtils.LogMessage(TAG, "No UART2 permission");
+                CommonUtils.LogMessage(TAG, "FT311UARTInterface: No UART2 permission");
             }
         } catch (Exception ex) {
             CommonUtils.LogMessage(TAG, "FT311UARTInterface: ResumeAccessory Exception: ", ex);

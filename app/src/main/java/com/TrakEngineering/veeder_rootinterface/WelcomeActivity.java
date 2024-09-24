@@ -19,6 +19,8 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.hardware.usb.UsbAccessory;
+import android.hardware.usb.UsbManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.wifi.WifiConfiguration;
@@ -148,6 +150,13 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
     public ExactAlarmReceiver exact_alarm_rec = null;
     public String current_Command = "";
 
+    //===================== USB Permission ================================//
+    public UsbManager usbmanager;
+    public PendingIntent mPermissionIntent;
+    private static final String ACTION_USB_PERMISSION = BuildConfig.APPLICATION_ID + ".USB_PERMISSION";
+    private boolean isUSBReceiverRegistered = false;
+    //=======================================================================//
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -189,10 +198,7 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
     @Override
     protected void onPause() {
         super.onPause();
-
         Log.i(TAG,"surelockcheck onPause");
-
-
     }
 
     @Override
@@ -209,7 +215,6 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
         btn_connect = (Button) findViewById(R.id.btn_connect);
         btn_disConnect = (Button) findViewById(R.id.btn_disConnect);
         edt_mac_address = (EditText) findViewById(R.id.edt_mac_address);
-
 
         InItGUI();
 
@@ -294,9 +299,33 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
         } else {
             linearMac.setVisibility(View.GONE);
             btn_disConnect.setVisibility(View.GONE);
+
+            //====================== USB Permission ================================//
+            try {
+                usbmanager = (UsbManager) this.getSystemService(Context.USB_SERVICE);
+                mPermissionIntent = PendingIntent.getBroadcast(WelcomeActivity.this, 0, new Intent(ACTION_USB_PERMISSION), 0);
+                UsbAccessory[] accessories = usbmanager.getAccessoryList();
+                UsbAccessory accessory = (accessories == null ? null : accessories[0]);
+                if (accessory != null) {
+                    if (!usbmanager.hasPermission(accessory)) {
+                        CommonUtils.LogMessage(TAG, "<WelcomeActivity: Registering the USB Receiver.>");
+                        IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+                        registerReceiver(mUsbReceiver, filter);
+                        isUSBReceiverRegistered = true;
+                        CommonUtils.LogMessage(TAG, "<WelcomeActivity: Requesting USB_PERMISSION.>");
+                        usbmanager.requestPermission(accessory, mPermissionIntent);
+                        return;
+                    } else {
+                        CommonUtils.LogMessage(TAG, "<WelcomeActivity: USB_PERMISSION is allowed.>");
+                    }
+                } else {
+                    CommonUtils.LogMessage(TAG, "<WelcomeActivity: UsbAccessory is null.>");
+                }
+            } catch (Exception ex) {
+                CommonUtils.LogMessage(TAG, "WelcomeActivity: Exception while checking USB_PERMISSION: ", ex);
+            }
+            //==========================================================================//
         }
-        /////////////////////////////////////////////////////////////////
-        /////////////////////////////////////////////////////////////////
 
         tvLatLng.setVisibility(View.GONE);
 
@@ -317,10 +346,8 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
 
         mGoogleApiClient.connect();
 
-
         TextView tvVersionNum = findViewById(R.id.tvVersionNum);
         tvVersionNum.setText("Version " + CommonUtils.getVersionCode(WelcomeActivity.this));
-
 
         SharedPreferences sharedPref = WelcomeActivity.this.getSharedPreferences(Constants.PREF_BAUDRATE, Context.MODE_PRIVATE);
         AppConstants.BaudRate = sharedPref.getString(Constants.PREF_BAUDRATE, "9600");
@@ -344,14 +371,12 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
         TextView tvTitle = findViewById(textView);
         tvTitle.setText(AppConstants.Title);
 
-
         // Display current date time u
         Thread myThread = null;
         Runnable myRunnableThread = new CountDownRunner(this, textDateTime);
         myThread = new Thread(myRunnableThread);
         myThread.start();
         //end current date time----------------------------------------------
-
 
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -377,7 +402,6 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
                 CustomDilaogEnterpin(WelcomeActivity.this, "Enter Security Pin", "tt");
             }
         });
-
 
         btn_connect.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -414,13 +438,11 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
             }
         });
 
-
         edt_vr_command.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 EnterpinForEditCommand(WelcomeActivity.this, "Enter Security Pin", "tt");
             }
-
         });
 
         CommonUtils.LogMessage(TAG, "*** WelcomeActivity:onCreate***" + "\n", null);
@@ -428,9 +450,43 @@ public class WelcomeActivity extends AppCompatActivity implements GoogleApiClien
         startService(new Intent(WelcomeActivity.this, BackgroundService.class));
 
         Do_next_BT_Service();
-
     }
 
+    private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            try {
+                String action = intent.getAction();
+                if (ACTION_USB_PERMISSION.equals(action)) {
+                    synchronized (this) {
+                        if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+                            CommonUtils.LogMessage(TAG, "<WelcomeActivity: USB Permission Allowed.>");
+                        } else {
+                            CommonUtils.LogMessage(TAG, "<WelcomeActivity: USB Permission Denied.>");
+                        }
+                    }
+                    proceedAfterUSBPermission();
+                }
+            } catch (Exception ex) {
+                CommonUtils.LogMessage(TAG, "WelcomeActivity: mUsbReceiver onReceive Exception: ", ex);
+                proceedAfterUSBPermission();
+            }
+        }
+    };
+
+    private void proceedAfterUSBPermission() {
+        if (isUSBReceiverRegistered) {
+            isUSBReceiverRegistered = false;
+            try {
+                CommonUtils.LogMessage(TAG, "<WelcomeActivity: Unregistering the USB Receiver.>");
+                unregisterReceiver(mUsbReceiver);
+            } catch (Exception ex) {
+                CommonUtils.LogMessage(TAG, "WelcomeActivity: unregisterReceiver (USB) Exception: ", ex);
+            }
+        }
+        CommonUtils.LogMessage(TAG, "<WelcomeActivity: Restarting the activity.>");
+        recreate();
+    }
 
     @Override
     protected void onStop() {
